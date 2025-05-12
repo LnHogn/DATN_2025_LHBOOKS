@@ -108,7 +108,13 @@
                     </div>
                     <div class="card-body">
                         <p><strong>Đã bán:</strong> @ViewBag.SoldQuantity</p>
-                        <p><strong>Còn lại:</strong> @ViewBag.StockQuantity</p>
+                        <p>
+                            <strong>Còn lại:</strong> @ViewBag.StockQuantity
+                            @if (isInFlashSale == true)
+                            {
+                                <span class="badge badge-danger ml-2" style="font-size: 14px; padding: 5px 10px; background-color: #FFA500; color: white;">Flash Sale</span>
+                            }
+                        </p>
                         @if (Model.IsSale == false && flashSale != null)
                         {
                             <div class="product_price">@Common.FormatNumber(@flashSale.FlashPrice, 0) đ<span>@Common.FormatNumber(Model.Price, 0) đ</span></div>
@@ -152,17 +158,6 @@
                                 {
                                     <div class="red_button add_to_cart_button_detail ml-3">
                                         <span class="text-light font-weight-bold">Hết hàng FlashSale</span>
-                                    </div>
-
-                                    <div class="red_button add_to_cart_button_detail ml-3" style="background-color: #007bff;">
-                                        <a href="#" class="btnAddToCart"
-                                           data-id="@Model.Id"
-                                           data-name="@Model.Name"
-                                           data-image="@Model.Image"
-                                           data-price="@Model.Price"
-                                           data-quantity="1">
-                                            Mua với giá gốc
-                                        </a>
                                     </div>
                                 }
                                 else
@@ -408,10 +403,12 @@
             var $quantityValue = $('#quantity_value');
             var $addToCartBtn = $('.btnAddToCart');
             var $buyNowBtn = $('.btnBuyNow');
-            var stock = parseInt($('.plus').data('stock'));
 
             $('.plus').click(function () {
-                var current = parseInt($quantityValue.text());
+                // Cập nhật số lượng tồn kho mỗi lần bấm (nếu có thể thay đổi động)
+                var stock = parseInt($('.plus').data('stock')) || 0;
+                var current = parseInt($quantityValue.text()) || 1;
+
                 if (current < stock) {
                     var newQuantity = current + 1;
                     $quantityValue.text(newQuantity);
@@ -421,6 +418,7 @@
                     toastr.warning("Số lượng vượt quá hàng tồn kho.");
                 }
             });
+
 
             $('.minus').click(function () {
                 var current = parseInt($quantityValue.text());

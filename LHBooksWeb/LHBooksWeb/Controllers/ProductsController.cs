@@ -162,11 +162,28 @@ namespace LHBooksWeb.Controllers
                 .SumAsync(od => (int?)od.Quantity) ?? 0;
 
             ViewBag.SoldQuantity = soldQuantity;
-            ViewBag.StockQuantity = product.Quantity; // đã trừ hàng khi đặt đơn
 
+            
+
+            // Tìm flash sale đang diễn ra cho sản phẩm hiện tại
+            var flashSale = product.FlashSaleProducts
+                .FirstOrDefault(fsp => fsp.FlashSale != null && fsp.FlashSale.EndTime > DateTime.Now);
+
+            bool isInFlashSale = flashSale != null;
+            bool isFlashSaleSoldOut = isInFlashSale && flashSale.Sold >= flashSale.QuantityLimit;
+
+            if (isInFlashSale)
+            {
+                // Số lượng còn lại trong Flash Sale
+                ViewBag.StockQuantity = flashSale.QuantityLimit - flashSale.Sold;
+            }
+            else
+            {
+                // Số lượng còn lại thông thường
+                ViewBag.StockQuantity = product.Quantity;
+            }
 
             await _context.SaveChangesAsync();
-
             return View(product);
         }
 
