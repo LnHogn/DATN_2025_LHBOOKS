@@ -1,0 +1,97 @@
+﻿@model IEnumerable<FlashSaleProduct>
+@{
+    ViewData["Title"] = "Flash Sale";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container product_section_container">
+    <div class="row">
+        <div class="col product_section clearfix">
+
+            <!-- Breadcrumbs -->
+            <nav aria-label="breadcrumb" class="mb-2 mt-2">
+                <ol class="breadcrumb bg-light p-3 rounded">
+                    <li class="breadcrumb-item">
+                        <a href="/">Trang chủ</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="#">@ViewData["Title"]</a>
+                    </li>
+                    <li class="breadcrumb-item "aria-current="page">@ViewBag.FlashSaleName</li>
+                </ol>
+            </nav>
+            <!-- Main Content -->
+            <div class="container">
+                <div class="products_iso">
+                    <div class="row">
+                        <div class="col">
+
+                            <!-- Product Grid -->
+                            <div class="product-grid_home">
+                                @if (Model != null && Model.Any())
+                                {
+                                    foreach (var item in Model)
+                                    {
+                                        var product = item.Product;
+                                        <div class="product-item flashsale product-item_hone">
+                                            <div class="product discount product_filter">
+                                                <div class="product-image" style="margin-bottom: 12px; text-align: center;">
+                                                    <img src="@(string.IsNullOrEmpty(product.Image) ? "/images/no-image.jpg" : product.Image)" alt="@product.Name" style="max-height: 170px; max-width: 100%; object-fit: contain;">
+                                                </div>
+                                                <div class="favorite favorite_left"></div>
+
+                                                <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center">
+                                                    <span>flash</span>
+                                                </div>
+
+                                                <div class="product_info">
+                                                    <h6 class="product_name">
+                                                        <a href="/Products/Detail/@product.Alias/@product.Id">@product.Name</a>
+                                                    </h6>
+                                                    <div class="product_price">
+                                                        @LHBooksWeb.Common.Common.FormatNumber(item.FlashPrice, 0)
+                                                        <span>@LHBooksWeb.Common.Common.FormatNumber(product.Price, 0) đ</span>
+                                                    </div>
+                                                    <div class="in_product_price d-none">@item.FlashPrice đ</div>
+                                                </div>
+                                            </div>
+                                            @if(item.Sold < item.QuantityLimit)
+                                            {
+                                                <div class="red_button add_to_cart_button">
+                                                    <a href="#" class="btnAddToCart"
+                                                       data-id="@product.Id"
+                                                       data-name="@product.Name"
+                                                       data-image="@product.Image"
+                                                       data-price="@item.FlashPrice"
+                                                       data-quantity="1">
+                                                        Thêm vào giỏ hàng
+                                                    </a>
+                                                </div>
+                                            }else{
+                                                <div class="red_button add_to_cart_button">
+                                                    <span class="text-light font-weight-bold">Đã hết hàng</span>
+                                                </div>
+                                            }
+                                           
+                                            
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div>Không có sản phẩm nào trong đợt Flash Sale này.</div>
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/customer/js/categories_custom.js"></script>
+}

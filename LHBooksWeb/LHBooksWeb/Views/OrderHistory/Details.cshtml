@@ -1,0 +1,173 @@
+﻿@model Order
+
+<style>
+    .card {
+        transition: box-shadow 0.3s ease;
+        border-radius: 6px;
+    }
+
+        .card:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+</style>
+
+<div class="container py-5">
+    <main aria-labelledby="title" style="margin-top: 120px;">
+        <div>
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb bg-light p-3 rounded">
+                    <li class="breadcrumb-item">
+                        <a href="/" style="color:#fe4c50;">Trang chủ</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/OrderHistory" style="color:#fe4c50;">Lịch sử mua hàng</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">Chi tiết đơn hàng</li>
+                </ol>
+            </nav>
+
+            <h3 class="mb-4">Chi tiết đơn hàng - <span class="text-primary">@Model.Code</span></h3>
+
+            <div class="row align-items-stretch">
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-lg h-100">
+                        <!-- Card Header with light gray background -->
+                        <div class="card-header bg-light">
+                            <strong>Thông tin đơn hàng</strong>
+                        </div>
+                        <div class="card-body">
+                            <p><strong>Ngày đặt:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                            <p><strong>Người đặt:</strong> @Model.CustomerName</p>
+                            <p><strong>SĐT:</strong> @Model.Phone</p>
+                            <p><strong>Địa chỉ:</strong> @Model.Address</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow-lg h-100">
+                        <!-- Card Header with light gray background -->
+                        <div class="card-header bg-light">
+                            <strong>Thanh toán & Trạng thái</strong>
+                        </div>
+                        <div class="card-body">
+                            <p>
+                                <strong>Phương thức thanh toán:</strong><br />
+                                @(Model.TypePayment == 1 ? "Thanh toán khi nhận hàng (COD)" :
+                                    Model.TypePayment == 2 ? "Thanh toán qua VNPAY" : "Không xác định")
+                            </p>
+                            <p><strong>Phí vận chuyển</strong> <span class="text-danger fw-bold">@Model.ShippingFee.ToString("n0") ₫</span></p>
+
+                            <p><strong>Tổng tiền:</strong> <span class="text-danger fw-bold">@Model.TotalAmount.ToString("n0") ₫</span></p>
+
+                            @{
+                                string statusClass = Model.Status switch
+                                {
+                                    OrderStatus.AwaitingPayment => "text-warning",
+                                    OrderStatus.PaymentFailed => "text-danger",
+                                    OrderStatus.Pending => "text-secondary",
+                                    OrderStatus.Confirmed => "text-info",
+                                    OrderStatus.Shipping => "text-primary",
+                                    OrderStatus.Delivered => "text-success",
+                                    OrderStatus.Cancelled => "text-danger",
+                                    OrderStatus.Paid => "text-success",
+                                    _ => "text-secondary"
+                                };
+                            }
+                            <p>
+                                <strong>Trạng thái:</strong><br />
+                                <span class="@statusClass fs-4 fw-bold">@Model.Status.GetDisplayName()</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-5">
+                <div class="card-header bg-light">
+                    <strong>Danh sách sản phẩm</strong>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Giá</th>
+                                    <th>Số lượng</th>
+                                    <th>Thành tiền</th>
+                                    <th>Flash Sale</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.OrderDetails)
+                                {
+                                    <tr>
+                                        <td>@item.ProductName</td>
+                                        <td>
+                                            <img src="@item.Product.Image" alt="Ảnh sản phẩm" style="width: 80px; height: auto; object-fit: cover;" />
+                                        </td>
+                                        <td>@item.Price.ToString("n0") ₫</td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.SubTotal.ToString("n0") ₫</td>
+                                        <td>
+                                            @if (item.FlashSale != null)
+                                            {
+                                                <span title="Đợt: @item.FlashSale.Title">
+                                                    🛍️ @item.FlashSale.Title
+                                                </span>
+                                            }
+                                            else
+                                            {
+                                                <span>Không</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="4" class="text-end fw-bold">Tổng tiền:</td>
+                                    <td colspan="2" class="fw-bold">@Model.OrderDetails.Sum(item => item.SubTotal).ToString("n0") ₫</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                Quay lại danh sách
+            </a>
+            @if (Model.Status == OrderStatus.Pending)
+            {
+                <button class="btn btn-danger" id="cancelOrderButton">Hủy đơn hàng</button>
+            }
+
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("cancelOrderButton")?.addEventListener("click", function () {
+            Swal.fire({
+                title: 'Bạn có chắc chắn muốn hủy đơn hàng?',
+                text: "Đơn hàng này sẽ không thể phục hồi!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Hủy đơn hàng',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send the request to cancel the order
+                    window.location.href = '@Url.Action("CancelOrder", "OrderHistory", new { orderId = Model.Id })';
+                }
+            });
+        });
+    </script>
+}

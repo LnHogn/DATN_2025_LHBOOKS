@@ -1,0 +1,77 @@
+﻿
+.review-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.user_star_rating {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+    display: flex;
+}
+
+    .user_star_rating li {
+        padding: 0;
+        margin: 0 2px;
+    }
+
+    .user_star_rating i {
+        font-size: 30px;
+        cursor: pointer;
+    }
+
+.fa-star {
+    color: #ffc107; /* Màu vàng cho sao được chọn */
+}
+
+.fa-star-o {
+    color: #cccccc; /* Màu xám cho sao chưa chọn */
+}
+
+.input_review {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.custom-tabs {
+    border-bottom: none !important;
+}
+
+    .custom-tabs .nav-link {
+        color: #fe4c50;
+        border: none;
+        border-radius: 0.5rem 0.5rem 0 0;
+        padding: 0.5rem 1rem;
+        background-color: transparent;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+        .custom-tabs .nav-link:hover {
+            background-color: rgba(254, 76, 80, 0.1);
+        }
+
+        .custom-tabs .nav-link.active {
+            background-color: #fe4c50;
+            color: #fff;
+            box-shadow: 0 4px 8px rgba(254, 76, 80, 0.2);
+        }

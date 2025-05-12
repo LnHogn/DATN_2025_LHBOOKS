@@ -1,0 +1,105 @@
+﻿@model IEnumerable<Product>
+
+
+<h4 class="mt-4 me-2">Sản phẩm liên quan</h4>
+<div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                if (item.IsActive == true)
+                {
+                    var flashSale = item.FlashSaleProducts.FirstOrDefault(fsp => fsp.FlashSale != null && fsp.FlashSale.EndTime > DateTime.Now);
+                    bool isInFlashSale = flashSale != null;
+                    bool isFlashSaleSoldOut = isInFlashSale && flashSale.Sold >= flashSale.QuantityLimit;
+                    <div class="swiper-slide">
+                        <div class="product-item @item.ProductCategory?.Alias" style="width:100% !important">
+                            <div class="product discount product_filter">
+                                <div class="product-image" style="margin-bottom: 12px; text-align: center;">
+                                    <img src="@(string.IsNullOrEmpty(item.Image) ? "/images/no-image.jpg" : item.Image)" alt="@item.Name" style="max-height: 170px; max-width: 100%; object-fit: contain;">
+                                </div>
+
+                                @if (item.IsSale == true && flashSale == null)
+                                {
+                                    <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center">
+                                        <span>
+                                            @{
+                                                var discountPercent = Math.Round(100 - (item.PriceSale / item.Price * 100));
+                                            }
+                                            -@discountPercent%
+                                        </span>
+                                    </div>
+                                }
+                                else if (flashSale != null)
+                                {
+                                    <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center"><span>Flash</span></div>
+                                }
+                                else if (item.IsSale == false)
+                                {
+                                    <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center" style="display: none !important;"></div>
+                                }
+
+                                <div class="product_info">
+                                    <h6 class="product_name">
+                                        <a href="/Products/Detail/@item.Alias/@item.Id">@item.Name</a>
+                                    </h6>
+
+                                    @if (item.IsSale == false && flashSale != null)
+                                    {
+                                        <div class="product_price">@Common.FormatNumber(@flashSale.FlashPrice, 0) đ<span>@Common.FormatNumber(item.Price, 0) đ</span></div>
+                                        <div class="in_product_price d-none">@flashSale.FlashPrice đ</div>
+                                    }
+                                    else if (item.IsSale == true && flashSale != null)
+                                    {
+                                        <div class="product_price">@Common.FormatNumber(@flashSale.FlashPrice, 0) đ<span>@Common.FormatNumber(item.Price, 0) đ</span></div>
+                                    }
+                                    else if (item.IsSale == true && flashSale == null)
+                                    {
+                                        <div class="product_price">@Common.FormatNumber(item.PriceSale, 0) đ<span>@Common.FormatNumber(item.Price, 0) đ</span></div>
+                                        <div class="in_product_price d-none">@item.PriceSale đ</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="product_price">@Common.FormatNumber(item.Price, 0) đ</div>
+                                        <div class="in_product_price d-none">@item.Price đ</div>
+                                    }
+                                </div>
+                        </div>                       
+                    </div>
+                </div>
+                }
+            }
+        }
+    </div>
+
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+    <div class="swiper-pagination"></div>
+</div>
+
+<script>
+    const swiper = new Swiper('.mySwiper', {
+        loop: true,
+        slidesPerView: 2,
+        spaceBetween: 15,
+        navigation: {
+            nextEl: '.swiper-button-next',
+            prevEl: '.swiper-button-prev',
+        },
+        pagination: {
+            el: '.swiper-pagination',
+            clickable: true,
+        },
+        autoplay: {
+            delay: 3000,
+            disableOnInteraction: false,
+        },
+        breakpoints: {
+            576: { slidesPerView: 2 },
+            768: { slidesPerView: 3 },
+            992: { slidesPerView: 4 },
+            1200: { slidesPerView: 5 },
+        }
+    });
+</script>

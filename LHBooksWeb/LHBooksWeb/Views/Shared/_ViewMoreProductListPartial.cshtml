@@ -1,0 +1,110 @@
+﻿@model IEnumerable<Product>
+
+<div class="book-section featured-books">
+    <div class="row">
+        <div class="col product_section clearfix">
+            <div class="main_content_hone">
+                <div class="row">
+                    <div class="col">
+                        <!-- Product Grid -->
+                        <div class="product-grid product-grid_home">
+                            @if (Model != null && Model.Any())
+                            {
+                                foreach (var item in Model)
+                                {
+                                    var flashSale = item.FlashSaleProducts.FirstOrDefault(fsp => fsp.FlashSale != null && fsp.FlashSale.EndTime > DateTime.Now);
+                                    bool isInFlashSale = flashSale != null;
+                                    bool isFlashSaleSoldOut = isInFlashSale && flashSale.Sold >= flashSale.QuantityLimit;
+                                    <div class="product-item product-item_hone @item.ProductCategory?.Alias">
+                                        <div class="product discount product_filter">
+                                            <div class="product-image" style="margin-bottom: 12px; text-align: center;">
+                                                <img src="@(string.IsNullOrEmpty(item.Image) ? "/images/no-image.jpg" : item.Image)" alt="@item.Name" style="max-height: 170px; max-width: 100%; object-fit: contain;">
+                                            </div>
+                                            @if (item.IsSale == true && flashSale == null)
+                                            {
+                                                <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center">
+                                                    <span>
+                                                        @{
+                                                            var discountPercent = Math.Round(100 - (item.PriceSale / item.Price * 100));
+                                                        }
+                                                        -@discountPercent%
+                                                    </span>
+                                                </div>
+                                            }
+                                            else if (flashSale != null)
+                                            {
+                                                <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center"><span>Flash</span></div>
+                                            }
+                                            else if (item.IsSale == false)
+                                            {
+                                                <div class="product_bubble product_bubble_right product_bubble_red d-flex flex-column align-items-center" style="display: none !important;"></div>
+                                            }
+
+                                            <div class="product_info">
+                                                <h6 class="product_name">
+                                                    <a href="/Products/Detail/@item.Alias/@item.Id">@item.Name</a>
+                                                </h6>
+                                                @if (item.IsSale == false && flashSale != null)
+                                                {
+                                                    <div class="product_price">@Common.FormatNumber(@flashSale.FlashPrice, 0) đ<span>@Common.FormatNumber(item.Price, 0) đ</span></div>
+                                                    <div class="in_product_price d-none">@flashSale.FlashPrice đ</div>
+                                                }
+                                                else if (item.IsSale == true && flashSale != null)
+                                                {
+                                                    <div class="product_price">@Common.FormatNumber(@flashSale.FlashPrice, 0) đ<span>@Common.FormatNumber(item.Price, 0) đ</span></div>
+                                                }
+                                                else if (item.IsSale == true && flashSale == null)
+                                                {
+                                                    <div class="product_price">@Common.FormatNumber(item.PriceSale, 0) đ<span>@Common.FormatNumber(item.Price, 0) đ</span></div>
+                                                    <div class="in_product_price d-none">@item.PriceSale đ</div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="product_price">@Common.FormatNumber(item.Price, 0) đ</div>
+                                                    <div class="in_product_price d-none">@item.Price đ</div>
+                                                }
+                                            </div>
+                                        </div>
+                                        @if (item.Quantity > 0)
+                                        {
+                                            if (isInFlashSale && isFlashSaleSoldOut)
+                                            {
+                                                <div class="red_button add_to_cart_button">
+                                                    <span class="text-light font-weight-bold">Hết hàng của đợt FlashSale</span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="red_button add_to_cart_button">
+                                                    <a href="#" class="btnAddToCart"
+                                                       data-id="@item.Id"
+                                                       data-name="@item.Name"
+                                                       data-image="@item.Image"
+                                                       data-price="@(
+                         (item.IsSale == false && flashSale != null) ? flashSale.FlashPrice :
+                         (item.IsSale == true && flashSale != null) ? flashSale.FlashPrice :
+                         (item.IsSale == true && flashSale == null) ? item.PriceSale :
+                         item.Price
+                     )"
+                                                       data-quantity="1">
+                                                        Thêm vào giỏ hàng
+                                                    </a>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="red_button add_to_cart_button">
+                                                <span class="text-light font-weight-bold">Tạm hết hàng</span>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

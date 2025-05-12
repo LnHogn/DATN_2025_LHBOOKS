@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Product>
+@{
+    ViewData["Title"] = "Tìm kiếm sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container product_section_container">
+    <div class="row">
+        <div class="col product_section clearfix">
+
+            <!-- Breadcrumbs -->
+            <nav aria-label="breadcrumb" class="mb-2 mt-4">
+                <ol class="breadcrumb bg-light p-3 rounded">
+                    <li class="breadcrumb-item">
+                        <a href="/">Trang chủ</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="#">@ViewData["Title"]</a>
+                    </li>
+                    <li class="breadcrumb-item " aria-current="page">@ViewBag.SearchKeyword</li>
+                </ol>
+            </nav>
+            <h4>
+                Kết quả tìm kiếm cho "@ViewBag.SearchKeyword"
+            </h4>     
+            <div class="container">
+                @Html.Partial("_ViewMoreProductListPartial", Model)
+                @if (ViewBag.NotFoundMessage != null)
+                {
+                    <div class="alert alert-warning">
+                        @ViewBag.NotFoundMessage
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/customer/js/categories_custom.js"></script>
+}

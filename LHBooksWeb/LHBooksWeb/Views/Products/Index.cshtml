@@ -1,0 +1,117 @@
+﻿@model IEnumerable<Product>
+@{
+    ViewData["Title"] = "Danh mục sản phẩm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container product_section_container">
+    <div class="row">
+        <div class="col product_section clearfix">
+
+            <!-- Breadcrumbs -->
+            <nav aria-label="breadcrumb" class="mb-2 mt-4">
+                <ol class="breadcrumb bg-light p-3 rounded">
+                    <li class="breadcrumb-item">
+                        <a href="/">Trang chủ</a>
+                    </li>
+                    <li class="breadcrumb-item " aria-current="page">@ViewData["Title"]</li>
+                </ol>
+            </nav>
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar_section">
+                    <div class="sidebar_title"><h5>Danh mục sản phẩm</h5></div>
+                    @await Component.InvokeAsync("MenuLeft", new { id = ViewBag.CateId })
+                </div>
+
+                <div class="sidebar_section">
+                    <div class="sidebar_title"><h5>Lọc theo giá</h5></div>
+                    <p><input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;" /></p>
+                    <div id="slider-range"></div>
+                    <div class="filter_button"><span>Lọc</span></div>
+                    <hr />
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main_content">
+                <div class="products_iso">
+                    <div class="row">
+                        <div class="col">
+
+                            <!-- Product Sorting -->
+                            <div class="product_sorting_container product_sorting_container_top">
+                                <ul class="product_sorting">
+                                    <li>
+                                        <span class="type_sorting_text">Sắp xếp mặc định</span>
+                                        <i class="fa fa-angle-down"></i>
+                                        <ul class="sorting_type">
+                                            <li class="type_sorting_btn" data-sort="default"><span>Sắp xếp mặc định</span></li>
+                                            <li class="type_sorting_btn" data-sort="price"><span>Xếp theo giá</span></li>
+                                            <li class="type_sorting_btn" data-sort="name"><span>Xếp theo tên</span></li>
+                                            <li class="type_sorting_btn" data-sort="mostViewed"><span>Xem nhiều nhất</span></li>
+                                        </ul>
+                                    </li>
+                                    <span>NXB: </span>
+                                    <li style="width:300px;">
+                                        <span class="publisher_filter_text">Tất cả NXB</span>
+                                        <i class="fa fa-angle-down"></i>
+                                        <ul class="filtering_publisher sorting_type" style="max-height: 300px; overflow-y: auto; overflow-x: hidden;">
+                                            <li class="publisher_filter_btn" data-publisher="0"><span>Tất cả NXB</span></li>
+                                            @if (ViewBag.Publishers != null)
+                                            {
+                                                @foreach (var publisher in ViewBag.Publishers)
+                                                {
+                                                    <li class="publisher_filter_btn" data-publisher="@publisher.Id"><span>@publisher.Name</span></li>
+                                                }
+                                            }
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <span>Hiển thị</span>
+                                        <span class="num_sorting_text">10</span>
+                                        <i class="fa fa-angle-down"></i>
+                                        <ul class="sorting_num">
+                                            <li class="num_sorting_btn"><span>10</span></li>
+                                            <li class="num_sorting_btn"><span>20</span></li>
+                                            <li class="num_sorting_btn"><span>30</span></li>
+                                            <li class="num_sorting_btn"><span>40</span></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                            <!-- Product Grid -->
+                            <div id="product-list">
+                                @* Danh sách sản phẩm sẽ được AJAX render lại ở đây *@
+                                @Html.Partial("_ProductListPartial", Model)
+                            </div>
+
+
+                            <div class="product_sorting_container product_sorting_container_bottom clearfix">
+                                <ul class="product_sorting">
+                                    <li>
+                                        <span>Hiển thị:</span>
+                                        <span class="num_sorting_text">10</span>
+                                        <i class="fa fa-angle-down"></i>
+                                        <ul class="sorting_num">
+                                            <li class="num_sorting_btn"><span>10</span></li>
+                                            <li class="num_sorting_btn"><span>20</span></li>
+                                            <li class="num_sorting_btn"><span>30</span></li>
+                                            <li class="num_sorting_btn"><span>40</span></li>
+                                            <li class="num_sorting_btn"><span>50</span></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/customer/js/categories_custom.js"></script>
+    <script src="~/customer/js/searchfilter.js"></script>
+}

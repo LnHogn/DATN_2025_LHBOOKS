@@ -1,0 +1,56 @@
+﻿@model IEnumerable<ProductCategory>
+
+@{
+    int itemCount = 0;
+    bool shouldExpandMenu = false;
+}
+
+<div class="sidebar_categories">
+    <ul class="limited-list">
+        <li>
+            <a href="/Products/Index" class="@(ViewBag.CateId == null ? "active" : "")">Tất Cả Sản Phẩm</a>
+        </li>
+
+        
+
+        @foreach (var item in Model)
+        {
+            var hasSubCategories = item.ProductSubCategories.Any();
+            var isItemActive = item.Id == ViewBag.CateId && item.Alias == ViewBag.CateAlias;
+            var isItemBeyondLimit = itemCount >= 10;
+
+            if (isItemActive && isItemBeyondLimit)
+            {
+                shouldExpandMenu = true;
+            }
+
+            <li class="@(isItemBeyondLimit ? "hidden-item" : "")">
+                <a href="/ProductCategory/Index/@item.Alias/@item.Id" class="@(isItemActive ? "active" : "")">@item.Title</a>
+            </li>
+            itemCount++;
+
+            if (hasSubCategories)
+            {
+                foreach (var sub in item.ProductSubCategories)
+                {
+                    var isSubItemActive = sub.Id == ViewBag.CateId && sub.Alias == ViewBag.SubCateAlias;
+                    var isSubItemBeyondLimit = itemCount >= 10;
+
+                    if (isSubItemActive && isSubItemBeyondLimit)
+                    {
+                        shouldExpandMenu = true;
+                    }
+
+                    <li class="sub-category @(isSubItemBeyondLimit ? "hidden-item" : "")">
+                        <a href="/ProductSubCategory/Index/@sub.Alias/@sub.Id" class="@(isSubItemActive ? "active" : "")">@sub.Title</a>
+                    </li>
+                    itemCount++;
+                }
+            }
+        }
+
+        <li class="view-more-container">
+            <a href="#" class="view-more" id="viewMoreCategories">Xem Thêm <i class="fa fa-angle-down"></i></a>
+        </li>
+    </ul>
+</div>

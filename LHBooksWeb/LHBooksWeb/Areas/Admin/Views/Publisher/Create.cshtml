@@ -1,0 +1,41 @@
+﻿@model Publisher
+
+@{
+    ViewBag.Title = "Thêm mới NXB";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="h3 mb-3 text-gray-800">Quản lý nhà xuất bản</h1>
+
+<form asp-area="Admin" asp-controller="Publisher" asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h5 class="m-0 font-weight-bold text-primary">Thêm mới tin NXB</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control" id="editor"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+
+            <button type="submit" class="btn btn-primary">Lưu</button>
+            <a href="/Admin/Publisher" class="btn btn-secondary">Hủy</a>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

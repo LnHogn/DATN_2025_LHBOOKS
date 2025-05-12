@@ -1,0 +1,86 @@
+﻿@model IEnumerable<Product>
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    CultureInfo cultureInfo = new CultureInfo("vi-VN");
+
+}
+
+<h1 class="h3 mb-3 text-gray-800">Quản lý sản phẩm</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h5 class="m-0 font-weight-bold text-primary">Danh sách đơn hàng</h5>
+        <div>
+            <a href="/Admin/Products/Create" class="btn btn-primary">Thêm mới</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table" id="myTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Hình ảnh</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Giá gốc</th>
+                        <th>Giá bán</th>
+                        <th>Ngày tạo</th>
+                        <th class="text-center">Giảm giá</th>
+                        <th class="text-center">Hiên thị</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        var i = 1;
+                        foreach (var item in Model)
+                        {
+                            var strCheck = item.IsActive ? "<i class='fa fa-check text-success'></i>" : "<i class='fas fa-times text-danger'></i>";
+                            var strCheckSale = item.IsSale ? "<i class='fa fa-check text-success'></i>" : "<i class='fas fa-times text-danger'></i>";
+                            var strCheckHot = item.IsHot ? "<i class='fa fa-check text-success'></i>" : "<i class='fas fa-times text-danger'></i>";
+                            var strCheckFea = item.IsFeature ? "<i class='fa fa-check text-success'></i>" : "<i class='fas fa-times text-danger'></i>";
+                            var strImg = "";
+                            var CheckImage = item.ProductImage.FirstOrDefault(x => x.IsDefault);
+                            if (CheckImage != null)
+                            {
+                                strImg = CheckImage.Image;
+                            }
+                            <tr id="trow_@item.Id" class="text-center">
+                                <td>@i</td>
+                                @{
+                                    var imgPath = @item.Image;
+                                }
+                                <td>
+                                    <img class="imgproduct" data-id="@item.Id" src="@imgPath" width="70" onerror="this.onerror=null; this.src='/images/default.png';" />
+                                </td>
+
+                                <td>@item.Name</td>
+                                <td>@item.Quantity</td>
+                                <td>@string.Format("{0:N0} ₫", item.Price)</td>
+                                <td>@string.Format("{0:N0} ₫", item.PriceSale)</td>
+                                <td>@(item.CreatedDate?.ToString("dd/MM/yyyy") ?? "Chưa có")</td>
+                                <td class="text-center">
+                                    <a href='#' data-id="@item.Id">@Html.Raw(strCheckSale)</a>
+                                </td>
+
+                                <td class="text-center">
+                                    <a href='#' data-id="@item.Id">@Html.Raw(strCheck)</a>
+                                </td>
+                                <td>
+                                    <a href="/Admin/Products/Details/@item.Id" class="btn btn-sm btn-info">Chi tiết</a>
+                                    <a href="/Admin/Products/edit/@item.Id" class="btn btn-sm btn-primary">Sửa</a>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

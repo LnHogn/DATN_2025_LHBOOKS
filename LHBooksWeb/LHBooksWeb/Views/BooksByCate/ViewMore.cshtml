@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Product>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container product_section_container">
+    <div class="row">
+        <div class="col product_section clearfix">
+            <nav aria-label="breadcrumb" class="mb-2 mt-4">
+                <ol class="breadcrumb bg-light p-3 rounded">
+                    <li class="breadcrumb-item">
+                        <a href="/">Trang chủ</a>
+                    </li>
+                    <li class="breadcrumb-item " aria-current="page">@ViewBag.Keyword</li>
+                </ol>
+            </nav>
+            <h4 class="mb-4">
+                Danh sách "@ViewBag.Keyword"
+            </h4>
+            <div class="container">
+                @Html.Partial("_ViewMoreProductListPartial", Model)
+            </div>
+
+            <!-- Center the button using Bootstrap classes -->
+            <div class="d-flex justify-content-center mt-4">
+                @if (!ViewBag.ShowAll)
+                {
+                    <a href="@Url.Action("ViewMore", new { type = ViewBag.Type, showAll = true })" style="font-size:17px;">Xem tất cả <i class="fa fa-angle-down"></i></a>
+                }
+                else
+                {
+                    <a href="@Url.Action("ViewMore", new { type = ViewBag.Type, showAll = false })" style="font-size:17px;">Thu gọn <i class="fa fa-angle-up"></i></a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/customer/js/categories_custom.js"></script>
+}

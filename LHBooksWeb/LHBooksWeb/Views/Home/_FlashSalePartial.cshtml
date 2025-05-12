@@ -1,0 +1,159 @@
+﻿@model List<FlashSaleProductViewModel>
+
+
+
+@{
+    DateTime? flashSaleEnd = ViewBag.FlashSaleEndTime as DateTime?;
+    var endTime = flashSaleEnd ?? DateTime.Now.AddHours(2); // nếu null thì lấy 2 tiếng nữa
+    var endTimeUnix = new DateTimeOffset(endTime).ToUnixTimeSeconds();
+
+}
+
+
+<div class="flash-sale-wrapper" style="background-color: #ff5152; padding: 20px; border-radius: 8px;">
+    <!-- Flash Sale Header -->
+    <div class="flash-sale-header" style="background-color: white; padding: 16px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div class="flash-sale-title" style="display: flex; align-items: center;">
+            <div class="sale-logo" style="font-weight: bold; color: #ff5152; font-size: 22px;">
+                FLA<span style="color: #ff5152;">⚡</span>H SALE
+            </div>
+            <input type="hidden" id="flash-sale-end-time" value="@ViewBag.FlashSaleEndTime" />
+
+            <div class="countdown" style="margin-left: 15px; display: flex; align-items: center;">
+                <span style="margin-right: 8px;">Kết thúc trong</span>
+                <div class="time-box" style="background-color: black; color: white; padding: 2px 8px; border-radius: 4px;">00</div>
+                <span style="margin: 0 4px;">:</span>
+                <div class="time-box" style="background-color: black; color: white; padding: 2px 8px; border-radius: 4px;">00</div>
+                <span style="margin: 0 4px;">:</span>
+                <div class="time-box" style="background-color: black; color: white; padding: 2px 8px; border-radius: 4px;">00</div>
+            </div>
+        </div>
+        <a href="/Products/FlashSaleAll?flashSaleId=@Model.FirstOrDefault()?.FlashSaleId" class="view-all" style="color: #0d6efd; text-decoration: none; display: flex; align-items: center;">
+            Xem tất cả
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-right" viewBox="0 0 16 16" style="margin-left: 4px;">
+                <path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+            </svg>
+        </a>
+    </div>
+
+    <!-- Product Cards Container -->
+    <div class="product-container" style="display: flex; overflow-x: auto; scroll-behavior: smooth; gap: 15px; padding-bottom: 10px;">
+        <!-- Product Cards -->
+        @foreach (var item in Model)
+        {
+            var product = item.Product;
+            var priceSale = item.FlashPrice;
+            var soldCount = item.Sold;
+
+            var discountPercent = 0;
+            if (product.Price > 0 && priceSale < product.Price)
+            {
+                discountPercent = (int)Math.Round(((product.Price - priceSale) / product.Price) * 100);
+            }
+
+            var soldPercentage = 0;
+            var totalItems = item.QuantityLimit;
+            if (totalItems > 0)
+            {
+                soldPercentage = (int)Math.Round((double)soldCount / totalItems * 100);
+            }
+
+
+            <div class="product-card" style="background-color: white; border-radius: 8px; padding: 16px; margin-right: 15px; width: 220px; flex-shrink: 0;">
+                <a href="/Products/Detail/@product.Alias/@product.Id" style="text-decoration: none; color: inherit;">
+                    <div class="product-image" style="margin-bottom: 12px; text-align: center;">
+                        <img src="@(string.IsNullOrEmpty(product.Image) ? "/images/no-image.jpg" : product.Image)" alt="@product.Name" style="max-height: 170px; max-width: 100%; object-fit: contain;">
+                    </div>
+                    <h3 class="product-title" style="font-size: 16px; margin-bottom: 12px; color: #212529; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">@product.Name</h3>
+                </a>
+
+                <div class="product-price" style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <span class="sale-price" style="font-weight: bold; color: #ff5152; font-size: 18px; margin-right: 8px;">@priceSale.ToString("N0") đ</span>
+                    @if (discountPercent > 0)
+                    {
+                        <span class="discount-badge" style="background-color: #ff5152; color: white; padding: 2px 6px; border-radius: 4px; font-size: 12px;">-@discountPercent%</span>
+                    }
+                </div>
+
+                @if (product.Price > 0 && product.Price > priceSale)
+                {
+                    <div class="original-price" style="color: #6c757d; text-decoration: line-through; font-size: 14px; margin-bottom: 8px;">@product.Price.ToString("N0") đ</div>
+                }
+
+               <div class="progress-container" style="height: 6px; background-color: #e9ecef; border-radius: 3px; margin-bottom: 8px; overflow: hidden;">
+    <div class="progress-bar" style="height: 100%; width: @soldPercentage%; background-color: #ff5152; border-radius: 3px;"></div>
+</div>
+
+
+                <div class="sold-info" style="color: #6c757d; font-size: 14px;">Đã bán @soldCount</div>
+            </div>
+        }
+    </div>
+</div>
+    <script>
+        // Nút next scroll danh sách sản phẩm
+        document.querySelector('.next-btn')?.addEventListener('click', function () {
+            const container = document.querySelector('.product-container');
+            const cardWidth = 235;
+            container.scrollBy({
+                left: cardWidth,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Lấy thời gian kết thúc flash sale từ biến server-side
+            const endTimeUnix = @endTimeUnix;
+            const countdownElements = document.querySelectorAll('.time-box');
+
+            // Hàm cập nhật countdown
+            function updateCountdown() {
+                const currentTime = Math.floor(Date.now() / 1000);
+                let timeRemaining = endTimeUnix - currentTime;
+
+                // Kiểm tra nếu thời gian đã hết
+                if (timeRemaining <= 0) {
+                    // Hiển thị 00:00:00 khi hết thời gian
+                    countdownElements.forEach(element => {
+                        element.textContent = '00';
+                    });
+                    // Có thể thêm xử lý khi flash sale kết thúc ở đây
+                    return;
+                }
+
+                // Tính toán giờ, phút, giây
+                const hours = Math.floor(timeRemaining / 3600);
+                timeRemaining %= 3600;
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+
+                // Cập nhật UI với các giá trị đã tính
+                countdownElements[0].textContent = hours.toString().padStart(2, '0');
+                countdownElements[1].textContent = minutes.toString().padStart(2, '0');
+                countdownElements[2].textContent = seconds.toString().padStart(2, '0');
+            }
+
+            // Cập nhật ban đầu
+            updateCountdown();
+
+            // Cập nhật mỗi giây
+            setInterval(updateCountdown, 1000);
+
+            // Nút next scroll danh sách sản phẩm (giữ nguyên code cũ)
+            document.querySelector('.next-btn')?.addEventListener('click', function () {
+                const container = document.querySelector('.product-container');
+                const cardWidth = 235;
+                container.scrollBy({
+                    left: cardWidth,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+
+
+
+
+
+

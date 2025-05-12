@@ -1,0 +1,268 @@
+﻿@model FlashSale
+@{
+    ViewData["Title"] = "Chi tiết Flash Sale";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+
+        <div class="d-flex align-items-center my-3">
+            <!-- Cột bên trái: Tiêu đề + thời gian -->
+            <div>
+                <h2 class="mb-1">Chi tiết Flash Sale: @Model.Title</h2>
+                <p class="mb-0">Thời gian: @Model.StartTime.ToString("g") - @Model.EndTime.ToString("g")</p>
+            </div>
+
+            <!-- Cột bên phải: Trạng thái -->
+            <div class="form-group mb-0 d-flex align-items-center" style="margin-left:50px;">
+                <label class="mb-0">Trạng thái Active</label>
+                <input id="isActiveCheckbox" type="checkbox" style="width:50px" class="form-control" @(Model.IsActive ? "checked" : "") />
+            </div>
+        </div>
+
+
+        <div class="row">
+            <!-- Cột trái: thêm sản phẩm đơn -->
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header bg-success text-white">Thêm sản phẩm đơn</div>
+                    <div class="card-body">
+                        <form method="post" asp-area="Admin" asp-controller="FlashSales" asp-action="AddProduct">
+                            <input type="hidden" name="flashSaleId" value="@Model.Id" />
+                            <div class="form-group">
+                                <label>Tên sản phẩm</label>
+                                <input type="text" id="productInput" class="form-control" placeholder="Nhập tên sản phẩm" />
+                                <input type="hidden" name="productId" id="productId" />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Số lượng</label>
+                                <input id="originalQuantity" class="form-control" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label>Giá gốc</label>
+                                <input id="originalPrice" class="form-control" readonly />
+                            </div>
+                            <div class="form-group">
+                                <label>Giá bán</label>
+                                <input id="salePrice" class="form-control" readonly />
+                            </div>
+
+                            <div class="form-group">
+                                <label>% giảm giá</label>
+                                <input name="discountPercent" type="number" class="form-control" min="1" max="100" required />
+                            </div>
+
+                            <div class="form-group">
+                                <label>Giới hạn số lượng</label>
+                                <input name="quantityLimit" type="number" class="form-control" />
+                            </div>
+
+                            <button type="submit" class="btn btn-success">Thêm</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Cột phải: thêm hàng loạt theo lựa chọn -->
+            <div class="col-md-6">
+                <!-- Card 1: tất cả sản phẩm -->
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">Thêm tất cả sản phẩm</div>
+                    <div class="card-body">
+                        <form method="post" asp-area="Admin" asp-controller="FlashSales" asp-action="AddAllProducts">
+                            <input type="hidden" name="flashSaleId" value="@Model.Id" />
+                            <div class="form-group">
+                                <label>% giảm giá</label>
+                                <input name="discountPercent" type="number" class="form-control" min="1" max="100" />
+                            </div>
+                            <div class="form-group">
+                                <label>Giới hạn số lượng</label>
+                                <input name="quantityLimit" type="number" class="form-control" />
+                            </div>
+                            <button type="submit" class="btn btn-primary">Thêm tất cả sản phẩm</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Card 2: theo danh mục chính -->
+                <div class="card mb-3">
+                    <div class="card-header bg-warning text-dark">Thêm sản phẩm theo danh mục chính</div>
+                    <div class="card-body">
+                        <form method="post" asp-area="Admin" asp-controller="FlashSales" asp-action="AddProductsByCategory">
+                            <input type="hidden" name="flashSaleId" value="@Model.Id" />
+                            <div class="form-group">
+                                <label>Chọn danh mục</label>
+                                <select name="categoryId" class="form-control">
+                                    @foreach (var category in ViewBag.Categories)
+                                    {
+                                        <option value="@category.Id">@category.Title</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>% giảm giá</label>
+                                <input name="discountPercent" type="number" class="form-control" min="1" max="100" />
+                            </div>
+                            <div class="form-group">
+                                <label>Giới hạn số lượng</label>
+                                <input name="quantityLimit" type="number" class="form-control" />
+                            </div>
+                            <button type="submit" class="btn btn-warning">Thêm sản phẩm theo danh mục</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Card 3: theo danh mục phụ -->
+                <div class="card">
+                    <div class="card-header bg-secondary text-white">Thêm sản phẩm theo danh mục phụ</div>
+                    <div class="card-body">
+                        <form method="post" asp-area="Admin" asp-controller="FlashSales" asp-action="AddProductsBySubcategory">
+                            <input type="hidden" name="flashSaleId" value="@Model.Id" />
+                            <div class="form-group">
+                                <label>Chọn danh mục phụ</label>
+                                <select name="subcategoryId" class="form-control">
+                                    @foreach (var sub in ViewBag.Subcategories)
+                                    {
+                                        <option value="@sub.Id">@sub.Title</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>% giảm giá</label>
+                                <input name="discountPercent" type="number" class="form-control" min="1" max="100" />
+                            </div>
+                            <div class="form-group">
+                                <label>Giới hạn số lượng</label>
+                                <input name="quantityLimit" type="number" class="form-control" />
+                            </div>
+                            <button type="submit" class="btn btn-dark">Thêm sản phẩm theo danh mục phụ</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        
+        <hr />
+
+        <h4>Danh sách sản phẩm</h4>
+        <table class="table" id="myTable" width="100%" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Tên sản phẩm</th>
+                    <th>Giá gốc</th>
+                    <th>Giá Flash</th>
+                    <th>Số lượng</th>
+                    <th>Đã bán</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.FlashSaleProducts)
+                {
+                    <tr class="text-center">
+                        <td>@item.Product.Name</td>
+                        <td>@item.Product.Price.ToString("N0")</td>
+                        <td>@item.FlashPrice.ToString("N0")</td>
+                        <td>@item.QuantityLimit</td>
+                        <td>@item.Sold</td>
+                        <td>
+                            <form asp-area="Admin" asp-controller="FlashSales" asp-action="RemoveProduct" method="post" style="display:inline;">
+                                <input type="hidden" name="flashSaleProductId" value="@item.Id" />
+                                <button class="btn btn-danger btn-sm" type="submit">Xoá</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <a href="/Admin/FlashSales/Index" class="btn btn-secondary">Quay lại danh sách</a>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script>
+    $(function () {
+    $("#productInput").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: '/Admin/FlashSales/SearchProducts', // Đảm bảo đúng đường dẫn đến Controller/Action
+                type: 'GET',
+                dataType: 'json',
+                data: { term: request.term },
+                success: function (data) {
+                    response(data);
+                }
+            });
+        },
+        minLength: 2,
+        select: function (event, ui) {
+            $("#productInput").val(ui.item.label); // Hiển thị tên sản phẩm
+            $("#productId").val(ui.item.id);       // Gán ID vào hidden
+
+            // Lấy giá sản phẩm từ UI item và kiểm tra "issale"
+            $.ajax({
+                url: '/Admin/FlashSales/GetProductPrice',  // Tạo một action trong controller để lấy giá
+                type: 'GET',
+                dataType: 'json',
+                data: { productId: ui.item.id },
+                success: function (data) {
+                    if (data.issale) {
+                        $("#salePrice").val(data.pricesale); // Hiển thị giá bán
+                        $("#originalPrice").val(data.price); // Hiển thị giá gốc
+                        $("#originalQuantity").val(data.quantity); // Hiển thị số lượng
+                    } else {
+                        $("#salePrice").val(data.price);    // Hiển thị giá gốc khi không bán
+                        $("#originalPrice").val(data.price);
+                        $("#originalQuantity").val(data.quantity);
+                    }
+                }
+            });
+
+            return false;
+        }
+    });
+});
+    </script>
+
+
+    <script>
+        const checkbox = document.getElementById("isActiveCheckbox");
+
+        checkbox.addEventListener("change", function () {
+            const isActive = this.checked;
+            const flashSaleId = document.querySelector('input[name="flashSaleId"]').value;
+
+            // Lưu trạng thái trước khi gửi request
+            const previousValue = !isActive;
+
+            fetch('/Admin/FlashSales/UpdateActiveStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    flashSaleId: flashSaleId,
+                    isActive: isActive
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        toastr.success('Cập nhật trạng thái thành công!');
+                    } else {
+                        checkbox.checked = previousValue; // Khôi phục trạng thái nếu có lỗi
+                        toastr.error(data.message || 'Có lỗi xảy ra khi cập nhật!');
+                    }
+                })
+                .catch(error => {
+                    checkbox.checked = previousValue; // Khôi phục nếu lỗi hệ thống
+                    toastr.error('Lỗi hệ thống khi gửi dữ liệu!');
+                });
+        });
+    </script>
+
+}

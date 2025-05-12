@@ -1,0 +1,453 @@
+﻿@model ProductViewModel
+
+@{
+    ViewData["Title"] = "Thêm mới sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    label {
+        font-weight: bold;
+    }
+</style>
+<h1 class="h3 mb-3 text-gray-800">Quản lý sản phẩm</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h5 class="m-0 font-weight-bold text-primary">Thêm mới sản phẩm</h5>
+    </div>
+    <form asp-action="Create" asp-controller="Products" method="post" enctype="multipart/form-data">
+
+    <div class="card-body">
+            @* <div asp-validation-summary="All" class="text-danger"></div> *@
+
+            
+        <div class="card">
+            <div class="card-header p-2">
+                <ul class="nav nav-pills">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#generalInfo" data-toggle="tab">Thông tin chung</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#images" data-toggle="tab">Hình ảnh</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <!-- Tab: Thông tin chung -->
+                    <div class="active tab-pane" id="generalInfo">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="Name" class="control-label">Tên sản phẩm</label>
+                                        <input asp-for="Name" class="form-control" />
+                                        <span asp-validation-for="Name" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label asp-for="ProductCode" class="control-label">Mã sản phẩm</label>
+                                        <input asp-for="ProductCode" class="form-control" />
+                                        <span asp-validation-for="ProductCode" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="Price" class="control-label">Giá gốc</label>
+                                        <input id="demoPrice" class="form-control currency-input" data-target="Price" value="@(Model?.Price.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) ?? "")" />
+                                        <input asp-for="Price" type="hidden" />
+                                        <span asp-validation-for="Price" class="text-danger" data-valmsg-for="Price"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="PriceSale" class="control-label">Giá bán</label>
+                                        <input id="demoPriceSale" class="form-control currency-input" data-target="PriceSale" value="@(Model?.PriceSale.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) ?? "")" />
+                                        <input asp-for="PriceSale" type="hidden" />
+                                        <span asp-validation-for="PriceSale" class="text-danger" data-valmsg-for="PriceSale"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="PublishYear" class="control-label">Năm xuất bản</label>
+                                        <input asp-for="PublishYear" class="form-control"/>
+                                        <span asp-validation-for="PublishYear" class="text-danger"></span>
+                                    </div>
+                                </div>                               
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="Format" class="control-label">Hình thức</label>
+                                        <select asp-for="Format" class="form-control" asp-items="@(new SelectList(new[] { "Bìa mềm", "Bìa cứng" }))"></select>
+                                        <span asp-validation-for="Format" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="Quantity" class="control-label">Số lượng</label>
+                                        <input asp-for="Quantity" class="form-control" />
+                                        <span asp-validation-for="Quantity" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="Language" class="control-label">Ngôn ngữ</label>
+                                        <input asp-for="Language" class="form-control" />
+                                        <span asp-validation-for="Language" class="text-danger"></span>
+                                    </div>
+                                </div>                              
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="Weight" class="control-label">Trọng lượng (gr)</label>
+                                        <input asp-for="Weight" class="form-control" />
+                                        <span asp-validation-for="Weight" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="PageCount" class="control-label">Số trang</label>
+                                        <input asp-for="PageCount" class="form-control" />
+                                        <span asp-validation-for="PageCount" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label asp-for="PublisherId" class="control-label">Nhà xuất bản</label>
+                                        <input type="text" id="PublisherInput" class="form-control" placeholder="Nhập tên nxb..." />
+
+                                        <!-- Hidden để lưu AuthorId -->
+                                        <input type="hidden" id="PublisherId" name="PublisherId" />
+                                        <span asp-validation-for="PublisherId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label asp-for="ProductCategoryId" class="control-label">Danh mục chính</label>
+                                        <select asp-for="ProductCategoryId" class="form-control" asp-items="@(ViewData["ProductCategories"] as SelectList)">
+                                            <option value="">-- Chọn danh mục chính --</option>
+                                        </select>
+                                        <span asp-validation-for="ProductCategoryId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label asp-for="ProductSubCategoryId" class="control-label">Danh mục phụ</label>
+                                        <select id="ProductSubCategoryId" asp-for="ProductSubCategoryId" class="form-control">
+                                            <option value="">-- Chọn danh mục phụ --</option>
+                                        </select>
+                                        <span asp-validation-for="ProductSubCategoryId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label class="control-label">Tác Giả</label>
+                                        <input asp-for="AuthorName" type="text" id="authorInput" class="form-control" placeholder="Nhập tên tác giả..." />
+
+                                        <!-- Hidden để lưu AuthorId -->
+                                        <input type="hidden" id="authorId" name="AuthorName" />
+                                        <span asp-validation-for="AuthorName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label asp-for="Translator" class="control-label">Người dịch</label>
+                                        <input asp-for="Translator" class="form-control" placeholder="Nhập tên người dịch hoặc để trống" />
+                                        <span asp-validation-for="Translator" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Description" class="control-label">Mô tả ngắn</label>
+                                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                                <span asp-validation-for="Description" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label asp-for="Detail" class="control-label">Chi tiết sản phẩm</label>
+                                <textarea asp-for="Detail" class="form-control" id="detail-editor" rows="6"></textarea>
+                                <span asp-validation-for="Detail" class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox">
+                                            <input asp-for="IsActive" class="custom-control-input" />
+                                            <label asp-for="IsActive" class="custom-control-label">Kích hoạt</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox">
+                                            <input asp-for="IsFeature" class="custom-control-input" />
+                                            <label asp-for="IsFeature" class="custom-control-label">Sách đặc sắc</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox">
+                                            <input asp-for="IsHot" class="custom-control-input" />
+                                            <label asp-for="IsHot" class="custom-control-label">Sách Hot</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-3">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox">
+                                            <input asp-for="IsSale" class="custom-control-input" />
+                                            <label asp-for="IsSale" class="custom-control-label">Sách giảm giá</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+
+                    <!-- Tab: Hình ảnh -->
+                    <div class="tab-pane" id="images">
+                        <div class="row">
+                            <div class="col-md-12 text-right">
+                                <label for="imageFiles" class="btn btn-primary">
+                                    Chọn ảnh
+                                </label>
+                                <input type="file" name="ImageFiles" multiple class="form-control d-none" accept="image/*" id="imageFiles" />
+                            </div>
+
+                            <div class="col-md-12">
+                                <label class="control-label">Ảnh preview</label>
+                                <div class="image-preview-container d-flex flex-wrap" id="imagePreviewContainer">
+                                    <!-- Các ảnh sẽ được hiển thị ở đây -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Lưu</button>
+            <a href="/Admin/Products/Index" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+    </div>
+    </form>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    
+    <script>
+        $(document).ready(function () {
+
+            // Khởi tạo CKEditor nếu có
+            if (typeof CKEDITOR !== 'undefined') {
+                CKEDITOR.replace('detail-editor');
+            }
+
+            // Xử lý preview ảnh
+            $('#imageFiles').on('change', function (event) {
+                const files = event.target.files;
+                const previewContainer = $('#imagePreviewContainer');
+                previewContainer.empty();
+
+                Array.from(files).forEach((file, index) => {
+                    const imageDiv = $(`
+                                <div class="position-relative mr-3 mb-3">
+                                    <img src="${URL.createObjectURL(file)}" style="width:150px; height:150px; object-fit:cover;" class="border" />
+                                    <div class="mt-2 text-center">
+                                        <input type="radio" name="DefaultImageId" id="default-image-${index}" value="${index}" ${index === 0 ? 'checked' : ''} />
+                                        <label for="default-image-${index}"> Ảnh mặc định</label>
+                                    </div>
+                                </div>
+                            `);
+                    previewContainer.append(imageDiv);
+                });
+            });
+
+
+            function formatCurrencyVND(value) {
+                if (!value) return '';
+                let number = parseFloat(value.replace(/[^\d,]/g, '').replace(',', '.'));
+                if (isNaN(number)) return '';
+                return number.toLocaleString('vi-VN', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                });
+            }
+
+            function toRawDecimal(value) {
+                if (!value) return '';
+                return value.replace(/\./g, '').replace(',', '.');
+            }
+
+            function isValidCurrency(value) {
+                if (!value) return false;
+                let number = parseFloat(toRawDecimal(value));
+                return !isNaN(number) && number >= 0;
+            }
+
+            // Cập nhật hidden input và định dạng khi người dùng nhập
+            $('.currency-input').on('input', function () {
+                let raw = $(this).val();
+                let numericValue = toRawDecimal(raw);
+                let formatted = formatCurrencyVND(numericValue);
+                $(this).val(formatted);
+
+                let target = $(this).data('target');
+                if (target) {
+                    let $hiddenInput = $(`input[name="${target}"]`);
+                    if ($hiddenInput.length) {
+                        $hiddenInput.val(toRawDecimal(formatted));
+                    }
+                }
+            });
+
+            // Format lại khi load trang (ví dụ edit form)
+            $('.currency-input').each(function () {
+                let target = $(this).data('target');
+                let $hiddenInput = $(`input[name="${target}"]`);
+                if ($hiddenInput.length && $hiddenInput.val()) {
+                    let formatted = formatCurrencyVND($hiddenInput.val());
+                    $(this).val(formatted);
+                }
+            });
+
+            $('form').on('submit', function (e) {
+                let isValid = true;
+
+                $('.currency-input').each(function () {
+                    let value = $(this).val();
+                    let target = $(this).data('target');
+                    let $errorSpan = $(`span[data-valmsg-for="${target}"]`);
+
+                    // Kiểm tra nếu trường trống hoặc không hợp lệ
+                    if (!value || !isValidCurrency(value)) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                        $errorSpan.text('Vui lòng nhập giá hợp lệ và lớn hơn hoặc bằng 0');
+                    } else {
+                        $(this).removeClass('is-invalid');
+                        $errorSpan.text('');
+                    }
+                });
+
+                // Kiểm tra xem cả hai trường giá (Price và PriceSale) có bị bỏ trống không
+                let price = toRawDecimal($('#demoPrice').val());
+                let priceSale = toRawDecimal($('#demoPriceSale').val());
+
+                if (!price) {
+                    isValid = false;
+                    $('#demoPrice').addClass('is-invalid');
+                    $('span[data-valmsg-for="Price"]').text('Giá gốc không được bỏ trống');
+                }
+
+                if (!priceSale) {
+                    isValid = false;
+                    $('#demoPriceSale').addClass('is-invalid');
+                    $('span[data-valmsg-for="PriceSale"]').text('Giá bán không được bỏ trống');
+                }
+
+                // Kiểm tra điều kiện giá bán phải nhỏ hơn giá gốc
+                if (parseFloat(priceSale) >= parseFloat(price)) {
+                    isValid = false;
+                    // Hiển thị lỗi cho giá khuyến mãi
+                    $('span[data-valmsg-for="PriceSale"]').text('Giá bán phải nhỏ hơn giá gốc');
+                    $('#demoPriceSale').addClass('is-invalid');
+                }
+
+                // Nếu có lỗi thì ngừng submit
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+
+
+
+        });
+    </script>
+
+    <script>
+        $(function () {
+            $("#authorInput").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/Admin/Author/SearchAuthors', // đổi tên Controller nếu cần
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { term: request.term },
+                        success: function (data) {
+                            response(data);
+
+                        }
+                    });
+                },
+                minLength: 2,
+                select: function (event, ui) {
+                    $("#authorInput").val(ui.item.label); // Gán tên vào ô hiển thị
+                    $("#authorId").val(ui.item.label);       // Gán ID vào hidden
+                    return false; // không ghi đè giá trị mặc định
+                }
+            });
+        });
+
+        $(function () {
+            $("#PublisherInput").autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: '/Admin/Publisher/SearchPub', // đổi tên Controller nếu cần
+                        type: 'GET',
+                        dataType: 'json',
+                        data: { term: request.term },
+                        success: function (data) {
+                            response(data);
+
+                        }
+                    });
+                },
+                minLength: 2,
+                select: function (event, ui) {
+                    $("#PublisherInput").val(ui.item.label); // Gán tên vào ô hiển thị
+                    $("#PublisherId").val(ui.item.id);       // Gán ID vào hidden
+                    return false; // không ghi đè giá trị mặc định
+                }
+            });
+        });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#ProductCategoryId').change(function () {
+                var selectedCategoryId = $(this).val();
+                var subCategoryDropdown = $('#ProductSubCategoryId');
+
+                // Xóa các option cũ
+                subCategoryDropdown.empty();
+                subCategoryDropdown.append($('<option>').val('').text('-- Chọn danh mục phụ --'));
+
+                if (selectedCategoryId) {
+                    $.getJSON('/Admin/Products/GetSubCategories', { categoryId: selectedCategoryId }, function (data) {
+                        $.each(data, function (i, item) {
+                            subCategoryDropdown.append(
+                                $('<option>').val(item.id).text(item.title)
+                            );
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+}
+

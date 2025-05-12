@@ -1,0 +1,301 @@
+﻿@model RevenueStatisticsViewModel
+@{
+    ViewData["Title"] = "Thống kê doanh thu";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    string GetPaymentMethodName(string paymentCode)
+    {
+        switch (paymentCode)
+        {
+            case "1": return "Thanh toán khi nhận hàng (COD)";
+            case "2": return "Thanh toán qua VnPay";
+            default: return "Phương thức khác";
+        }
+    }
+}
+
+<div class="container-fluid">
+    <h2 class="mb-4">Thống kê doanh thu</h2>
+
+    <!-- Bộ lọc thời gian -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+            <i class="fas fa-filter mr-1"></i>
+            <h6 class="m-0 font-weight-bold text-primary">Tìm kiếm theo khoảng thời gian</h6>
+        </div>
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="startDate" class="form-label">Từ ngày</label>
+                    <input type="date" class="form-control" id="startDate" name="startDate" value="@Model.StartDate.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-4">
+                    <label for="endDate" class="form-label">Đến ngày</label>
+                    <input type="date" class="form-control" id="endDate" name="endDate" value="@Model.EndDate.ToString("yyyy-MM-dd")">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Áp dụng</button>
+                    <a href="@Url.Action("RevenueStatistics")" class="btn btn-outline-secondary ml-2">Đặt lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tổng quan doanh thu -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+            <i class="fas fa-money-bill mr-1"></i>
+            <h6 class="m-0 font-weight-bold text-primary">Tổng quan doanh thu</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-info">
+                        <h4>Tổng doanh thu: @Model.TotalRevenue.ToString("N0") VNĐ</h4>
+                        <p>Thời gian: @Model.StartDate.ToString("dd/MM/yyyy") - @Model.EndDate.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Biểu đồ doanh thu theo ngày -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+                    <i class="fas fa-chart-area mr-1"></i>
+                    <h6 class="m-0 font-weight-bold text-primary">Doanh thu theo ngày</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="dailyRevenueChart" width="100%" height="40"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Doanh thu theo phương thức thanh toán và danh mục -->
+    <div class="row">
+        <!-- Biểu đồ doanh thu theo phương thức thanh toán -->
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+                    <i class="fas fa-chart-pie mr-1"></i>
+                    <h6 class="m-0 font-weight-bold text-primary">Doanh thu theo phương thức thanh toán</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="paymentMethodChart" width="100%" height="60"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biểu đồ doanh thu theo danh mục -->
+        <div class="col-md-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+                    <i class="fas fa-chart-pie mr-1"></i>
+                    <h6 class="m-0 font-weight-bold text-primary">Doanh thu theo danh mục</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="categoryChart" width="100%" height="60"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bảng chi tiết doanh thu theo ngày -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+            <i class="fas fa-table mr-1"></i>
+            <h6 class="m-0 font-weight-bold text-primary">Chi tiết doanh thu theo ngày</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table" id="myTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Ngày</th>
+                            <th class="text-end">Doanh thu</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.DailyRevenue)
+                        {
+                            <tr class="text-center">
+                                <td>@item.Date.ToString("dd/MM/yyyy")</td>
+                                <td class="text-end">@item.Revenue.ToString("N0") VNĐ</td>
+                                <td>
+                                    <a class="btn btn-sm btn-info" asp-action="DailyOrderDetails" asp-route-date="@item.Date.ToString("yyyy-MM-dd")">Xem chi tiết</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/adminlib/vendor/chart.js/chart.bundle.js"></script>
+    <script src="~/adminlib/vendor/chart.js/chart.js"></script>
+    <script>
+        // Dữ liệu cho biểu đồ doanh thu theo ngày
+        const dailyRevenueData = {
+            labels: [@Html.Raw(string.Join(",", Model.DailyRevenue.Select(x => $"'{x.Date.ToString("dd/MM")}'").ToArray()))],
+            datasets: [{
+                label: 'Doanh thu (VNĐ)',
+                data: [@string.Join(",", Model.DailyRevenue.Select(x => x.Revenue.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray())],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        };
+
+
+        // Dữ liệu cho biểu đồ theo phương thức thanh toán
+        const paymentMethodData = {
+            // Sử dụng mảng để đảm bảo hiển thị đúng tên phương thức thanh toán
+            labels: [@Html.Raw(string.Join(",", Model.RevenueByPaymentMethod.Keys.Select(key => $"'{GetPaymentMethodName(key)}'").ToArray()))],
+            datasets: [{
+                label: 'Doanh thu (VNĐ)',
+                data: [@string.Join(",", Model.RevenueByPaymentMethod.Values.Select(v => v.ToString(System.Globalization.CultureInfo.InvariantCulture)))],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        // Dữ liệu cho biểu đồ theo danh mục
+        const categoryData = {
+            labels: [@Html.Raw(string.Join(",", Model.RevenueByCategory.Keys.Select(x => $"'{x}'").ToArray()))],
+            datasets: [{
+                label: 'Doanh thu (VNĐ)',
+                data: [@string.Join(",", Model.RevenueByCategory.Values.Select(v => v.ToString(System.Globalization.CultureInfo.InvariantCulture)))],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(201, 203, 207, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(201, 203, 207, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        // Khởi tạo biểu đồ khi trang đã tải xong
+        document.addEventListener('DOMContentLoaded', function () {
+            // Biểu đồ doanh thu theo ngày
+            new Chart(document.getElementById('dailyRevenueChart'), {
+                type: 'line',
+                data: dailyRevenueData,
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            min: 0,
+                            suggestedMin: 0,
+                            grace: '0%',  // Không thêm khoảng trống dưới giá trị tối thiểu
+                            ticks: {
+                                callback: function (value) {
+                                    return value.toLocaleString('vi-VN') + ' VNĐ';
+                                }
+                            }
+                        }
+                    },
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Biểu đồ doanh thu theo ngày'
+                        }
+                    }
+                }
+            });
+
+            // Biểu đồ doanh thu theo phương thức thanh toán
+            new Chart(document.getElementById('paymentMethodChart'), {
+                type: 'pie',
+                data: paymentMethodData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Doanh thu theo phương thức thanh toán'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.label || '';
+                                    let value = context.raw;
+                                    let sum = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = Math.round((value / sum) * 100);
+                                    return `${label}: ${value.toLocaleString('vi-VN')} VNĐ (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Biểu đồ doanh thu theo danh mục
+            new Chart(document.getElementById('categoryChart'), {
+                type: 'doughnut',
+                data: categoryData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Doanh thu theo danh mục'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.label || '';
+                                    let value = context.raw;
+                                    let sum = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = Math.round((value / sum) * 100);
+                                    return `${label}: ${value.toLocaleString('vi-VN')} VNĐ (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

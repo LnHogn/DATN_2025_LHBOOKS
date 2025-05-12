@@ -1,0 +1,33 @@
+﻿@model FlashSale
+@{
+    ViewData["Title"] = "Tạo Flash Sale mới";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<h2>Tạo Flash Sale mới</h2>
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <form asp-area="Admin" asp-controller="FlashSales" asp-action="Create" method="post">
+            <div class="form-group">
+                <label>Tiêu đề</label>
+                <input asp-for="Title" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label>Thời gian bắt đầu</label>
+                <input asp-for="StartTime" class="form-control" type="datetime-local" />
+            </div>
+            <div class="form-group">
+                <label>Thời gian kết thúc</label>
+                <input asp-for="EndTime" class="form-control" type="datetime-local" />
+            </div>
+            <div class="form-group">
+                <label asp-for="IsActive" class="control-label"></label>
+                <input asp-for="IsActive" class="form-control" type="checkbox" style="width:50px" />
+                <span asp-validation-for="IsActive" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Lưu</button>
+            <a href="/Admin/FlashSales/Index" class="btn btn-secondary">Quay lại danh sách</a>
+
+        </form>
+    </div>
+</div>

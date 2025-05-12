@@ -1,0 +1,242 @@
+﻿@model Order
+@using System.Globalization
+
+@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    CultureInfo cultureInfo = new CultureInfo("vi-VN");
+
+}
+
+<h1 class="h3 mb-3 text-gray-800">Quản lý đơn hàng</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+        <h5 class="m-0 font-weight-bold text-primary">Chi tiết đơn hàng</h5>
+        <a asp-action="PrintInvoice" asp-route-orderId="@Model.Id" target="_blank" class="btn-sm btn-primary">In hoá đơn</a>
+    </div>
+
+    <div class="card-body">
+        <!-- Thông tin đơn hàng và khách hàng -->
+        <div class="row mb-4">
+            <!-- Thông tin đơn hàng -->
+            <div class="col-md-6">
+                <h6 class="text-uppercase text-muted mb-3">Thông tin đơn hàng</h6>
+                <div class="mb-2"><strong>Mã đơn hàng:</strong> <span class="form-control">@Model.Code</span></div>
+                <div class="mb-2">
+                    <strong>Phí vận chuyển:</strong>
+                    <span class="form-control">
+                        @(Model.ShippingFee == 0 ? "0 đ" : Model.ShippingFee.ToString("#,###", cultureInfo) + " đ")
+                    </span>
+                </div>
+                <div class="mb-2">
+                    <strong>Tổng tiền:</strong>
+                    <span class="form-control">@Model.TotalAmount.ToString("#,###", cultureInfo) đ</span>
+                </div>
+                <div class="mb-2">
+                    <strong>Ngày tạo:</strong>
+                    <span class="form-control">@(Model.OrderDate.ToString("dd/MM/yyyy HH:mm") ?? "Chưa có")</span>
+                </div>
+                <div class="mb-2">
+                    <strong>Phương thức thanh toán:</strong>
+                    <span class="form-control">
+                        @(Model.TypePayment == 1 ? "COD (Thanh toán khi nhận hàng)" : "Chuyển khoản")
+                    </span>
+                </div>
+            </div>
+
+            <!-- Thông tin khách hàng -->
+            <div class="col-md-6">
+                <h6 class="text-uppercase text-muted mb-3">Thông tin khách hàng</h6>
+                <div class="mb-2"><strong>Họ tên:</strong> <span class="form-control">@Model.CustomerName</span></div>
+                <div class="mb-2"><strong>Số điện thoại:</strong> <span class="form-control">@Model.Phone</span></div>
+                <div class="mb-2"><strong>Email:</strong> <span class="form-control">@Model.Email</span></div>
+                <div class="mb-2">
+                    <strong>Trạng thái:</strong>
+                    <div class="d-flex align-items-center">
+                        <span id="trang_thai"
+                              class="badge fs-6 py-2 px-3
+@(Model.Status == OrderStatus.AwaitingPayment ? "badge-warning" :
+  Model.Status == OrderStatus.PaymentFailed ? "badge-danger" :
+  Model.Status == OrderStatus.Pending ? "badge-secondary" :
+  Model.Status == OrderStatus.Confirmed ? "badge-primary" :
+  Model.Status == OrderStatus.Shipping ? "badge-info" :
+  Model.Status == OrderStatus.Delivered ? "badge-success" :
+  Model.Status == OrderStatus.Cancelled ? "badge-dark" :
+  Model.Status == OrderStatus.Paid ? "badge-success" :
+  "badge-light")" style="font-size:90% !important">
+                            @(Model.Status == OrderStatus.AwaitingPayment ? "Chờ thanh toán" :
+                                Model.Status == OrderStatus.PaymentFailed ? "Thanh toán thất bại" :
+                                Model.Status == OrderStatus.Pending ? "Chờ xác nhận" :
+                                Model.Status == OrderStatus.Confirmed ? "Đã xác nhận" :
+                                Model.Status == OrderStatus.Shipping ? "Đang giao hàng" :
+                                Model.Status == OrderStatus.Delivered ? "Đã giao hàng" :
+                                Model.Status == OrderStatus.Cancelled ? "Đã hủy" :
+                                Model.Status == OrderStatus.Paid ? "Đã thanh toán" :
+                                "Không xác định")
+                        </span>
+
+                        <a href="#"
+                           class="btn btn-sm btn-danger btnCapNhat d-flex align-items-center justify-content-center ml-3"
+                           data-id="@Model.Id"
+                           style="height: 30px;">
+                            Cập nhật
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Danh sách sản phẩm -->
+        <div class="row">
+            <div class="col-12 mb-3">
+                <h5 class="text-primary border-bottom pb-2">Danh sách sản phẩm</h5>
+            </div>
+            <div class="col-12">
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="thead-light">
+                            <tr>
+                                <th style="width: 100px;"></th>
+                                <th>Tên sản phẩm</th>
+                                <th>Giá</th>
+                                <th>Số lượng</th>
+                                <th>Thành tiền</th>
+                                <th>Flash Sale</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderDetails)
+                            {
+                                <tr>
+                                    <td class="text-center">
+                                        <img src="@item.Product.Image" alt="Ảnh sản phẩm" style="width: 80px; height: auto; object-fit: cover;">
+                                    </td>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.Price.ToString("#,###", cultureInfo) đ</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@((item.Price * item.Quantity).ToString("#,###", cultureInfo)) đ</td>
+                                    <td>@(item.FlashSale != null ? item.FlashSale.Title : "Không")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút quay lại -->
+        <div class="d-flex justify-content-end mt-4">
+            <a href="/Admin/Order/Index" class="btn btn-secondary">Quay lại</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $('body').on('click', '.btnCapNhat', function () {
+                var id = $(this).data("id");
+                var $badge = $(this).siblings('#trang_thai');
+                var currentStatus = $badge.text().trim();
+
+                var statusOptions = {
+                    "Chờ thanh toán": 0,
+                    "Thanh toán thất bại": 1,
+                    "Chờ xác nhận": 2,
+                    "Đã xác nhận": 3,
+                    "Đang giao hàng": 4,
+                    "Đã giao hàng": 5,
+                    "Đã hủy": 6,
+                    // "Đã thanh toán": 7
+                };
+
+                var badgeClasses = {
+                    0: "badge-warning",
+                    1: "badge-danger",
+                    2: "badge-secondary",
+                    3: "badge-primary",
+                    4: "badge-info",
+                    5: "badge-success",
+                    6: "badge-dark",
+                    7: "badge-success"
+                };
+
+                var statusTexts = Object.keys(statusOptions).reduce((acc, key) => {
+                    acc[statusOptions[key]] = key;
+                    return acc;
+                }, {});
+
+                // Kiểm tra nếu trạng thái là "Chờ thanh toán", "Thanh toán thất bại", "Đã giao hàng" hoặc "Đã hủy"
+                if ([0, 1, 5, 6].includes(statusOptions[currentStatus])) {
+                    Swal.fire("Không thể chỉnh sửa!", "Đơn hàng đã hoàn tất, huỷ hoặc đã hoàn tiền.", "warning");
+                    return;
+                }
+
+                // Cập nhật trạng thái có thể chọn dựa trên trạng thái hiện tại
+                var inputOptions = {};
+                switch (statusOptions[currentStatus]) {
+                    case 2: // "Chờ xác nhận"
+                        inputOptions = {
+                            3: "Đã xác nhận",
+                             4:"Đang giao hàng",
+
+                            6: "Đã hủy"
+                        };
+                        break;
+                    case 3: // "Đã xác nhận"
+                        inputOptions = {
+                            4: "Đang giao hàng",
+                            6: "Đã hủy"
+                        };
+                        break;
+                    case 4: // "Đang giao hàng"
+                        inputOptions = {
+                            5: "Đã giao hàng",
+                            6: "Đã hủy"
+                        };
+                        break;
+                }
+
+                Swal.fire({
+                    title: "Cập nhật trạng thái",
+                    input: "select",
+                    inputOptions: inputOptions,
+                    inputValue: statusOptions[currentStatus],
+                    showCancelButton: true,
+                    confirmButtonText: "Lưu",
+                    cancelButtonText: "Hủy",
+                    preConfirm: (tt) => {
+                        return $.ajax({
+                            url: "/admin/order/UpdateTT",
+                            type: "POST",
+                            data: { id: id, trangthai: tt }
+                        }).then(response => {
+                            if (!response.success) {
+                                Swal.showValidationMessage(response.message || "Lỗi cập nhật trạng thái!");
+                            }
+                        });
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var newStatus = statusTexts[result.value];
+                        var newBadgeClass = badgeClasses[result.value];
+
+                        // Cập nhật nội dung và lớp badge
+                        $badge
+                            .text(newStatus)
+                            .removeClass(function (index, className) {
+                                // Xóa các lớp 'badge-*' hiện tại
+                                return (className.match(/(^|\s)badge-\S+/g) || []).join(' ');
+                            })
+                            .addClass('badge fs-6 py-2 px-3 ' + newBadgeClass); // Thêm lớp mới
+
+                        Swal.fire("Cập nhật thành công!", "", "success");
+                    }
+                });
+            });
+        });
+    </script>
+}

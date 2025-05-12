@@ -1,0 +1,350 @@
+﻿@model DashboardViewModel
+@{
+    ViewData["Title"] = "Thống kê";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+}
+
+<div class="container-fluid">
+
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
+        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-download fa-sm text-white-50"></i> Tạo file thống kê
+        </a>
+    </div>
+
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">Tạo file thống kê</h5>
+                </div>
+                <div class="modal-body">
+                    <form id="exportForm">
+                        <div class="mb-3">
+                            <label for="startDate" class="form-label">Từ ngày:</label>
+                            <input type="date" class="form-control" id="startDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="endDate" class="form-label">Đến ngày:</label>
+                            <input type="date" class="form-control" id="endDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Định dạng file:</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="fileType" id="excelType" value="excel" checked>
+                                <label class="form-check-label" for="excelType">
+                                    <i class="fas fa-file-excel text-success me-1"></i> Excel
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="fileType" id="pdfType" value="pdf">
+                                <label class="form-check-label" for="pdfType">
+                                    <i class="fas fa-file-pdf text-danger me-1"></i> PDF
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <a type="button" href="/Admin/Dashboard/Index" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</a>
+                    <button type="button" class="btn btn-primary" id="btnExport">Xuất file</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="row justify-content-between">
+            <!-- Summary Cards -->
+            <div class="col-xl-2 col-lg-3 col-md-6 mb-4">
+                <div class="card border-left-primary shadow py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Tổng doanh thu
+                                </div>
+                                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                                    @Model.TotalSales.ToString("N0") đ
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                        <a asp-action="RevenueStatistics">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-2 col-lg-3 col-md-6 mb-4">
+                <div class="card border-left-info shadow py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Tổng đơn hàng
+                                </div>
+                                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                                    @Model.TotalOrders
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                        <a asp-action="OrderStatistics">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-2 col-lg-3 col-md-6 mb-4">
+                <div class="card border-left-success shadow py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Đơn hàng mới
+                                </div>
+                                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                                    @Model.NewOrders
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-clipboard-list fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                        <a asp-area="Admin" asp-controller="Order" asp-action="Index">Xem đơn hàng</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-2 col-lg-3 col-md-6 mb-4">
+                <div class="card border-left-warning shadow py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                    Flash Sale
+                                </div>
+                                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                                    @Model.ActiveFlashSaleCount
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                        <a asp-action="FlashSaleStatistics">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- New Card: Tổng số sản phẩm -->
+            <div class="col-xl-2 col-lg-3 col-md-6 mb-4">
+                <div class="card border-left-danger shadow py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                    Sản phẩm
+                                </div>
+                                <div class="h6 mb-0 font-weight-bold text-gray-800">
+                                    @Model.TotalProducts
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-box fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                        <a asp-action="ProductStatistics">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Row -->
+    <div class="row">
+        <div class="col-xl-6 col-lg-6 d-flex">
+            <div class="card shadow mb-4 w-100">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+                    <i class="fas fa-chart-bar mr-1"></i>
+                    <h6 class="m-0 font-weight-bold text-primary">Doanh số theo tháng</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <div class="chart-area">
+                        <canvas id="monthlySalesChart" width="100%" height="60"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-6 col-lg-6 d-flex">
+            <div class="card shadow mb-4 w-100">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+                    <i class="fas fa-chart-pie mr-1"></i>
+                    <h6 class="m-0 font-weight-bold text-primary">Trạng thái đơn hàng</h6>
+                </div>
+                <!-- Card Body -->
+                <div class="card-body">
+                    <canvas id="orderStatusChart" width="100%" height="60"></canvas>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Products Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+            <i class="fas fa-table mr-1"></i>
+            <h6 class="m-0 font-weight-bold text-primary">Sản phẩm bán chạy</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table" id="myTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Mã sản phẩm</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Đã bán</th>
+                            <th>Doanh thu</th>
+                            <th>Tồn kho</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int topSellingStt = 1;
+                        }
+                        @foreach (var product in Model.TopSellingProducts)
+                        {
+                            <tr class="text-center">
+                                <td>@(topSellingStt++)</td>
+                                <td>@product.ProductId</td>
+                                <td>@product.ProductName</td>
+                                <td>@product.QuantitySold</td>
+                                <td>@product.Revenue.ToString("N0") đ</td>
+                                <td>@product.StockQuantity</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/adminlib/vendor/chart.js/chart.bundle.js"></script>
+    <script src="~/adminlib/vendor/chart.js/chart.js"></script>
+    <script>
+        // Monthly Sales Chart
+        var monthlySalesCtx = document.getElementById('monthlySalesChart').getContext('2d');
+        var monthlySalesChart = new Chart(monthlySalesCtx, {
+            type: 'bar',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.MonthlySalesData.Keys.Select(x => $"'{x}'")))],
+                datasets: [{
+                    label: 'Số đơn hàng',
+                    data: [@string.Join(",", Model.MonthlySalesData.Values)],
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Order Status Chart
+        var orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+        var orderStatusChart = new Chart(orderStatusCtx, {
+            type: 'pie',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.OrderStatusDistribution.Keys.Select(x => $"'{x}'")))],
+                datasets: [{
+                    data: [@string.Join(",", Model.OrderStatusDistribution.Values)],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 206, 86, 0.5)',
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(153, 102, 255, 0.5)',
+                        'rgba(255, 159, 64, 0.5)',
+                        'rgba(199, 199, 199, 0.5)',
+                        'rgba(83, 102, 255, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(199, 199, 199, 1)',
+                        'rgba(83, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        // Xử lý modal xuất file thống kê
+        $(document).ready(function () {
+            // Kích hoạt modal khi nhấp vào nút "Tạo file thống kê"
+            $(".btn-primary.shadow-sm").click(function (e) {
+                e.preventDefault();
+                // Thay đổi cách gọi modal theo Bootstrap 5
+                var myModal = new bootstrap.Modal(document.getElementById('exportModal'));
+                myModal.show();
+            });
+
+            // Thiết lập ngày mặc định là ngày hiện tại
+            const today = new Date().toISOString().split('T')[0];
+            $("#endDate").val(today);
+
+            // Thiết lập ngày bắt đầu là 30 ngày trước
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            $("#startDate").val(thirtyDaysAgo.toISOString().split('T')[0]);
+
+            // Xử lý sự kiện khi nhấn nút "Xuất file"
+            $("#btnExport").click(function () {
+                const startDate = $("#startDate").val();
+                const endDate = $("#endDate").val();
+                const fileType = $("input[name='fileType']:checked").val();
+
+                if (startDate && endDate) {
+                    // Kiểm tra ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc
+                    if (new Date(startDate) > new Date(endDate)) {
+                        alert('Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc!');
+                        return;
+                    }
+
+                    // Chuyển hướng đến action xuất file với các tham số đã chọn
+                    const url = `/Admin/Dashboard/ExportSalesData?startDate=${startDate}&endDate=${endDate}&format=${fileType}`;
+                    window.location.href = url;
+
+                    // Đóng modal sau khi xử lý (cũng sử dụng cách mới)
+                    var modal = bootstrap.Modal.getInstance(document.getElementById('exportModal'));
+                    modal.hide();
+                } else {
+                    alert('Vui lòng nhập đầy đủ thông tin ngày tháng!');
+                }
+            });
+        });
+    </script>
+}

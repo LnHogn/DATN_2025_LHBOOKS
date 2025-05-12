@@ -1,0 +1,228 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin LHBooks</title>
+
+    <!-- Fonts & Styles -->
+    <link rel="stylesheet" href="~/AdminLib/vendor/fontawesome-free/css/all.min.css">
+    <link href="~/adminlib/css/ggfont.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/AdminLib/css/sb-admin-2.min.css">
+    <link href="~/AdminLib/css/MainStyle.css" rel="stylesheet" />
+    <link href="~/adminlib/datatable/datatables.css" rel="stylesheet" />
+    <link href="~/lib/content/content/toastr.css" rel="stylesheet" />
+    <link href="~/lib/sweetarlet/package/dist/sweetalert2.css" rel="stylesheet" />
+    <link href="~/lib/jquery-ui-1.14.1.custom/jquery-ui.css" rel="stylesheet" />
+</head>
+<body id="page-top" class="d-flex flex-column min-vh-100">
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+        <div id="sidebar">
+            @await Html.PartialAsync("_PartialSideBar")
+            <!-- Sidebar -->    
+        </div>
+
+        <nav id="navbar" class="navbar navbar-expand navbar-light bg-white topbar fixed-top shadow">
+            <!-- Topbar Search -->
+            <!-- Topbar Navbar -->
+            <ul class="navbar-nav ml-auto">
+
+                <!-- Nav Item - Search Dropdown (Visible Only XS) -->
+                <li class="nav-item dropdown no-arrow d-sm-none">
+                    <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-search fa-fw"></i>
+                    </a>
+                </li>
+
+                <div class="topbar-divider d-none d-sm-block"></div>
+
+                <!-- Nav Item - User Information -->
+                <li class="nav-item dropdown no-arrow">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        @using Microsoft.AspNetCore.Identity
+                        <span class="mr-2 d-none d-lg-inline text-gray-600 small">@User.Identity.Name</span>
+                        <img class="img-profile rounded-circle" src="~/AdminLib/img/undraw_profile.svg">
+                    </a>
+                    <!-- Dropdown - User Information -->
+                    <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                        
+                        <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Đăng xuất
+                        </a>
+                    </div>
+                </li>
+
+            </ul>
+
+        </nav>
+        <div id="content-wrapper" class="d-flex flex-column h-100">
+
+
+            <!-- Main Content -->
+            <main id="main-content" class="d-flex flex-column mt-4 h-100">
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+            </main>
+
+
+            <!-- Footer -->
+            <footer class="bg-white text-center py-3 border-top">
+                <div class="container">
+                    <span>&copy; 2025 - LHBooks</span>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">Bạn có chắc chắn muốn đăng xuất không?</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Huỷ</button>
+
+                    <!-- Sử dụng Form để gọi Action LogOut với phương thức POST -->
+                    <form action="@Url.Action("LogOut", "Account", new { area = "Admin" })" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-primary">Đăng xuất</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JavaScript -->
+    <script src="~/AdminLib/vendor/jquery/jquery.min.js"></script>
+    <script src="~/AdminLib/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/AdminLib/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="~/AdminLib/js/sb-admin-2.min.js"></script>
+    @RenderSection("Scripts", required: false)
+    <script src="~/adminlib/ckeditor/ckeditor.js"></script>
+
+    <script src="~/lib/content/scripts/toastr.js"></script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/adminlib/datatable/datatables.js"></script>
+
+    <script src="~/lib/sweetarlet/package/dist/sweetalert2.all.min.js"></script>
+
+    <script src="~/lib/jquery-ui-1.14.1.custom/jquery-ui.min.js"></script>
+    <script>
+        // let table = new DataTable('#myTable');
+        $(document).ready(function () {
+            $("#sidebarToggle").click(function () {
+                $("#sidebar").toggleClass("collapsed");
+                $("#content-wrapper").toggleClass("expanded");
+            });
+
+            const commonOptions = {
+                language: {
+                    "lengthMenu": "Hiển thị _MENU_ dòng",
+                    "zeroRecords": "Không tìm thấy dữ liệu",
+                    "info": "Hiển thị _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "infoEmpty": "Không có dữ liệu để hiển thị",
+                    "infoFiltered": "(được lọc từ tổng số _MAX_ dòng)",
+                    "search": "Tìm kiếm:",
+                    "emptyTable": "Không có dữ liệu",
+                }
+            };
+
+            // Khởi tạo bảng đơn hàng với sắp xếp theo Ngày tạo (cột thứ 7, index = 6)
+            $('#orderTable').DataTable({
+                ...commonOptions,
+                order: [[6, "desc"]]
+            });
+            $('#flashsaleTb').DataTable({
+                ...commonOptions,
+                order: [[1, "asc"]]
+            });
+            $('#flashtb').DataTable({
+                ...commonOptions,
+                order: [[2, "desc"]]
+            });
+            $('#myTable2').DataTable({
+                ...commonOptions,
+            });
+            $('#myTable3').DataTable({
+                ...commonOptions,
+            });
+
+            // Các bảng khác dùng cấu hình chung
+            $('#myTable').not('#orderTable').not('#flashtb').not('#flashsaleTb').each(function () {
+                $(this).DataTable(commonOptions);
+            });
+
+        });
+        
+
+    </script>
+    <script>
+        // Cấu hình Toastr
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "2000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        }
+
+        // Kiểm tra và hiển thị các thông báo từ TempData
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <text>
+                toastr.success('@TempData["SuccessMessage"]');
+            </text>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <text>
+                toastr.error('@TempData["ErrorMessage"]');
+            </text>
+        }
+
+        @if (TempData["InfoMessage"] != null)
+        {
+            <text>
+                toastr.info('@TempData["InfoMessage"]');
+            </text>
+        }
+
+        @if (TempData["WarningMessage"] != null)
+        {
+            <text>
+                toastr.warning('@TempData["WarningMessage"]');
+            </text>
+        }
+    </script>
+</body>
+</html>

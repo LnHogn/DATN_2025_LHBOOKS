@@ -1,0 +1,85 @@
+﻿
+<ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <!-- Sidebar - Brand -->
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/Admin/Dashboard/Index">
+        <div class="sidebar-brand-icon rotate-n-15">
+            <i class="fas fa-laugh-wink"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">LHBooks</div>
+    </a>
+    <!-- Divider -->
+    <hr class="sidebar-divider my-0">
+
+    @{
+        var activeController = ViewData["ActiveController"]?.ToString();
+    }
+
+    <!-- Danh sách menu -->
+    <li class="nav-item @(activeController == "Dashboard" ? "active" : "")">
+        <a class="nav-link" href="/Admin/Dashboard/Index">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
+
+    <li class="nav-item @(activeController == "Account" ? "active" : "")">
+        <a class="nav-link" href="/Admin/Account/Index">
+            <i class="fas fa-fw fa-user"></i>
+            <span>Quản lý tài khoản</span>
+        </a>
+    </li>
+
+    <li class="nav-item @(activeController == "Author" ? "active" : "")">
+        <a class="nav-link" href="/Admin/Author/Index">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Quản lý Tác giả</span>
+        </a>
+    </li>
+    <li class="nav-item @(activeController == "Publisher" ? "active" : "")">
+        <a class="nav-link" href="/Admin/Publisher/Index">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Quản lý NXB</span>
+        </a>
+    </li>
+
+
+    <li class="nav-item @(activeController == "FlashSales" ? "active" : "")">
+        <a class="nav-link" href="/Admin/FlashSales/Index">
+            <i class="fas fa-fw fa-shopping-cart"></i>
+            <span>FlashSale</span>
+        </a>
+    </li>
+
+    <li class="nav-item @(activeController == "Order" ? "active" : "")">
+        <a class="nav-link" href="/Admin/Order/Index">
+            <i class="fas fa-fw fa-shopping-cart"></i>
+            <span>Đơn hàng</span>
+        </a>
+    </li>
+    <li class="nav-item @(activeController == "Contact" ? "active" : "")">
+        <a class="nav-link" href="/Admin/Contact/Index">
+            <i class="fas fa-fw fa-address-book"></i>
+            <span>Quản lý liên hệ</span>
+        </a>
+    </li>
+
+    <!-- Quản lý sản phẩm (Dropdown) -->
+    <li class="nav-item @(activeController == "ProductCategory" || activeController == "ProductSubCategory" || activeController == "Products" ? "active" : "")">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProducts" aria-expanded="false">
+            <i class="fas fa-fw fa-cog"></i>
+            <span>Quản lý sản phẩm</span>
+        </a>
+        <div id="collapseProducts" class="collapse @(activeController == "ProductCategory" || activeController == "ProductSubCategory" || activeController == "Products" ? "show" : "")">
+            <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item @(activeController == "ProductCategory" ? "active" : "")" href="/Admin/ProductCategory">Danh mục</a>
+                <a class="collapse-item @(activeController == "ProductSubCategory" ? "active" : "")" href="/Admin/ProductSubCategory">Danh mục phụ</a>
+                <a class="collapse-item @(activeController == "Products" ? "active" : "")" href="/Admin/Products">Sản phẩm</a>
+            </div>
+        </div>
+    </li>
+
+    <li class="nav-item text-center mt-3">
+        <button id="sidebarToggle" class="rounded-circle border-0">
+        </button>
+    </li>
+</ul>

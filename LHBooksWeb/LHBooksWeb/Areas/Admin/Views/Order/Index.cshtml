@@ -1,0 +1,212 @@
+﻿@model IEnumerable<Order>
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    CultureInfo cultureInfo = new CultureInfo("vi-VN");
+
+}
+
+<h1 class="h3 mb-3 text-gray-800">Quản lý đơn hàng</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h5 class="m-0 font-weight-bold text-primary">Danh sách đơn hàng</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table" id="orderTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr >
+                        <th>Mã đơn hàng</th>
+                        <th>Tên khách hàng</th>
+                        <th>Số ĐT</th>
+                        <th>Tiền</th>
+                        <th>Tthanh toán</th>
+                        <th>Trạng thái</th>
+                        <th>Ngày tạo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr class="text-center">
+                                <td>@item.Code</td>
+                                <td>@item.CustomerName</td>
+                                <td>@item.Phone</td>
+                                <td>@item.TotalAmount.ToString("#,###", cultureInfo) đ</td>
+                                <td>@(item.TypePayment == 1 ? "COD" : "Chuyển khoản")</td>
+                                <td>
+                                    <span id="trangthai-@item.Id"
+                                          class="badge badge fs-6 py-2 px-3
+            @(item.Status == OrderStatus.AwaitingPayment ? "badge-warning" :
+              item.Status == OrderStatus.PaymentFailed ? "badge-danger" :
+              item.Status == OrderStatus.Pending ? "badge-secondary" :
+              item.Status == OrderStatus.Confirmed ? "badge-primary" :
+              item.Status == OrderStatus.Shipping ? "badge-info" :
+              item.Status == OrderStatus.Delivered ? "badge-success" :
+              item.Status == OrderStatus.Cancelled ? "badge-dark" :
+              item.Status == OrderStatus.Paid ? "badge-success" :
+              "badge-light")" style="font-size:90% !important">
+                                        @(item.Status == OrderStatus.AwaitingPayment ? "Chờ thanh toán" :
+                                            item.Status == OrderStatus.PaymentFailed ? "Thanh toán thất bại" :
+                                            item.Status == OrderStatus.Pending ? "Chờ xác nhận" :
+                                            item.Status == OrderStatus.Confirmed ? "Đã xác nhận" :
+                                            item.Status == OrderStatus.Shipping ? "Đang giao hàng" :
+                                            item.Status == OrderStatus.Delivered ? "Đã giao hàng" :
+                                            item.Status == OrderStatus.Cancelled ? "Đã hủy" :
+                                            item.Status == OrderStatus.Paid ? "Đã thanh toán" :
+                                            "Không xác định")
+                                    </span>
+                                </td>
+
+                                <td data-order="@item.OrderDate.ToString("yyyy-MM-dd HH:mm:ss")">
+                                    @(item.OrderDate.ToString("dd/MM/yyyy") ?? "Chưa có")
+                                </td>
+
+                                <td>
+                                    <a asp-controller="Order" asp-action="Detail" asp-route-id="@item.Id" class="btn btn-sm btn-success">Xem</a>
+                                    <a href="#" class="btn btn-sm btn-danger btnCapNhat" data-id="@item.Id">Cập nhật</a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>     
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $('body').on('click', '.btnCapNhat', function () {
+                var id = $(this).data("id");
+                var currentStatus = $(`#trangthai-${id}`).text().trim();
+                var statusOptions = {
+                    "Chờ thanh toán": 0,
+                    "Thanh toán thất bại": 1,
+                    "Chờ xác nhận": 2,
+                    "Đã xác nhận": 3,
+                    "Đang giao hàng": 4,
+                    "Đã giao hàng": 5,
+                    "Đã hủy": 6,
+                    "Đã thanh toán": 7,
+                };
+                var reverseStatusOptions = {
+                    0: "Chờ thanh toán",
+                    1: "Thanh toán thất bại",
+                    2: "Chờ xác nhận",
+                    3: "Đã xác nhận",
+                    4: "Đang giao hàng",
+                    5: "Đã giao hàng",
+                    6: "Đã hủy",
+                    7: "Đã thanh toán"
+                };
+
+                // Không cho chỉnh sửa nếu đơn đã giao hoặc hoàn tiền
+                if (statusOptions[currentStatus] === 5 || statusOptions[currentStatus] === 6 || statusOptions[currentStatus] === 1 || statusOptions[currentStatus] === 0) {
+                    Swal.fire("Không thể chỉnh sửa!", "Đơn hàng không cho phép sửa", "warning");
+                    return;
+                }
+
+                // Xác định các trạng thái có thể cập nhật, dựa trên trạng thái hiện tại
+                var validStatusOptions = {};
+                switch (statusOptions[currentStatus]) {
+                    case 0: // "Chờ thanh toán"
+                        validStatusOptions = {
+                            "Chờ xác nhận": 2,
+                            "Đã xác nhận": 3,
+                            "Đang giao hàng": 4,
+                            "Đã giao hàng": 5,
+                            "Đã hủy": 6,
+                        };
+                        break;
+                    case 1: // "Thanh toán thất bại"
+                        validStatusOptions = {
+                        };
+                        break;
+                    case 2: // "Chờ xác nhận"
+                        validStatusOptions = {
+                            "Đã xác nhận": 3,
+                            "Đang giao hàng": 4,
+                            "Đã hủy": 6,
+                        };
+                        break;
+                    case 3: // "Đã xác nhận"
+                        validStatusOptions = {
+                            "Đang giao hàng": 4,
+                            "Đã hủy": 6,
+                        };
+                        break;
+                    case 4: // "Đang giao hàng"
+                        validStatusOptions = {
+                            "Đã giao hàng": 5,
+                            "Đã hủy": 6,
+                        };
+                        break;
+                    case 5: // "Đã giao hàng"
+                        validStatusOptions = {}; // Không thể thay đổi nữa
+                        break;
+                    case 6: // "Đã hủy"
+                        validStatusOptions = {}; // Không thể thay đổi nữa
+                        break;
+                    case 7: // "Đã thanh toán"
+                        validStatusOptions = {
+                            "Đã xác nhận": 3,
+                            "Đang giao hàng": 4,
+                            "Đã hủy": 6,
+                        }; // Không thể thay đổi nữa
+                        break;
+                }
+
+                // Tạo danh sách các trạng thái có thể chọn
+                var inputOptions = {};
+                $.each(validStatusOptions, function (key, value) {
+                    inputOptions[value] = key;
+                });
+
+                // Nếu không có trạng thái hợp lệ, thông báo không thể sửa
+                if ($.isEmptyObject(inputOptions)) {
+                    Swal.fire("Không thể cập nhật trạng thái!", "Đơn hàng này không thể sửa trạng thái nữa", "warning");
+                    return;
+                }
+
+                Swal.fire({
+                    title: "Cập nhật trạng thái",
+                    input: "select",
+                    inputOptions: inputOptions,
+                    inputValue: statusOptions[currentStatus],
+                    showCancelButton: true,
+                    confirmButtonText: "Lưu",
+                    cancelButtonText: "Hủy",
+                    preConfirm: (tt) => {
+                        return $.ajax({
+                            url: "/admin/order/UpdateTT",
+                            type: "POST",
+                            data: { id: id, trangthai: tt }
+                        }).then(response => {
+                            if (!response.success) {
+                                Swal.showValidationMessage(response.message || "Lỗi cập nhật trạng thái!");
+                            }
+                        });
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire("Cập nhật thành công!", "", "success");
+                        // Cập nhật nội dung trong bảng
+                        $(`#trangthai-${id}`).text(reverseStatusOptions[result.value]);
+                        setTimeout(function () {
+                            location.reload();
+                        }, 700);
+                    }
+                });
+            });
+        });
+    </script>
+}

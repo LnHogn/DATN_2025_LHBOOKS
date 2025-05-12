@@ -1,0 +1,58 @@
+﻿@model UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Thông tin tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container py-5">
+    <main aria-labelledby="title" style="margin-top: 120px;">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
+                <li class="breadcrumb-item">
+                    <a href="/">Trang chủ</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Thông tin tài khoản</li>
+            </ol>
+        </nav>
+
+        <div class="card shadow-sm rounded">
+            <div class="card-header bg-light border-0 text-center">
+                <h3 class="mb-0">Thông tin tài khoản</h3>
+            </div>
+            <div class="card-body p-4">
+                <table class="table table-hover align-middle">
+                    <tbody style="font-size:14px !important">
+                        <tr>
+                            <td><strong>Họ và tên</strong></td>
+                            <td>@(string.IsNullOrEmpty(Model.FullName) ? "Chưa cập nhật" : Model.FullName)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Email</strong></td>
+                            <td>@(string.IsNullOrEmpty(Model.Email) ? "Chưa cập nhật" : Model.Email)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Số điện thoại</strong></td>
+                            <td>@(string.IsNullOrEmpty(Model.Phone) ? "Chưa cập nhật" : Model.Phone)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tên đăng nhập</strong></td>
+                            <td>@(string.IsNullOrEmpty(Model.UserName) ? "Chưa cập nhật" : Model.UserName)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Địa chỉ</strong></td>
+                            <td>@(string.IsNullOrEmpty(Model.Address) ? "Chưa cập nhật" : Model.Address)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="text-center mt-4">
+                    <a href="/Account/EditProfile?returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)"
+                       class="btn btn-warning ">
+                        <i class="fa fa-edit me-2"></i> Chỉnh sửa thông tin
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>

@@ -1,0 +1,92 @@
+﻿.sidebar_categories {
+    font-family: Arial, sans-serif;
+}
+
+    /* Tiêu đề nếu có */
+    .sidebar_categories .category_header {
+        font-weight: bold;
+        padding: 6px 0;
+        color: #333;
+        text-transform: uppercase;
+        margin-bottom: 3px;
+    }
+
+    /* Reset list */
+    .sidebar_categories ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Danh mục chính */
+    .sidebar_categories > ul > li > a {
+        color: #333;
+        padding: 5px 8px;
+        display: block;
+        text-decoration: none;
+        line-height: 1.4;
+        margin-bottom: 2px;
+        border-radius: 4px;
+        transition: background 0.2s ease;
+    }
+
+        .sidebar_categories > ul > li > a:hover {
+            background-color: #f5f5f5;
+        }
+
+    /* Mục "Tất cả sản phẩm" */
+    .sidebar_categories > ul > li:first-child > a {
+        color: #555;
+    }
+
+    /* Danh mục phụ */
+    .sidebar_categories .sub-category {
+        padding-left: 16px;
+        margin: 2px 0;
+    }
+
+        .sidebar_categories .sub-category li a {
+            color: #666;
+            padding: 4px 8px;
+            display: block;
+            text-decoration: none;
+            line-height: 1.4;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
+
+            .sidebar_categories .sub-category li a:hover {
+                background-color: #f2f2f2;
+            }
+
+    /* Mục đang active */
+    .sidebar_categories a.active {
+        color: #FF5E3A !important;
+        font-weight: bold;
+        background-color: #ffe9e4;
+    }
+
+    /* Nút "Xem thêm / Thu gọn" */
+    .sidebar_categories .view-more-container {
+        text-align: center;
+        margin-top: 8px;
+    }
+
+    .sidebar_categories .view-more {
+        color: #FF5E3A;
+        font-weight: bold;
+        display: inline-block;
+        padding: 6px 10px;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+        .sidebar_categories .view-more:hover {
+            color: #ff3c1f;
+            text-decoration: underline;
+        }
+
+    /* Ẩn mục vượt giới hạn */
+    .sidebar_categories .hidden-item {
+        display: none;
+    }

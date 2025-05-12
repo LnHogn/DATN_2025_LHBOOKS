@@ -1,0 +1,138 @@
+﻿@model List<Order>
+
+@{
+    ViewData["Title"] = "Thống kê chi tiết theo ngày";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex justify-content-between align-items-center">
+            <h6 class="m-0 font-weight-bold text-primary">Chi tiết đơn hàng trong ngày @Model.FirstOrDefault()?.OrderDate.ToString("dd/MM/yyyy")</h6>
+            <button onclick="exportOrdersToExcel()" class="btn btn-sm btn-success mb-3">📥 Xuất Excel</button>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    @foreach (var order in Model)
+                    {
+                        <div class="card-body order-container">
+                            <div class="card-header" style="background-color: #e2e6ea; color: #000; font-size:18px;">
+                                <i class="bi bi-receipt"></i> Mã đơn:@order.Code - @order.CustomerName (<i class="bi bi-telephone"></i> @order.Phone)
+                            </div>
+
+                            <div class="card-body">
+                                <p><strong>Địa chỉ:</strong> @order.Address</p>
+                                <p>
+                                    <strong>Trạng thái:</strong>
+                                    @(order.Status == OrderStatus.AwaitingPayment ? "Chờ thanh toán" :
+                                        order.Status == OrderStatus.PaymentFailed ? "Thanh toán thất bại" :
+                                        order.Status == OrderStatus.Pending ? "Chờ xác nhận" :
+                                        order.Status == OrderStatus.Confirmed ? "Đã xác nhận" :
+                                        order.Status == OrderStatus.Shipping ? "Đang giao hàng" :
+                                        order.Status == OrderStatus.Delivered ? "Đã giao hàng" :
+                                        order.Status == OrderStatus.Cancelled ? "Đã hủy" :
+                                        order.Status == OrderStatus.Paid ? "Đã thanh toán" :
+                                        "Không xác định")
+                                </p>
+                                <p><strong>Ngày đặt:</strong> @order.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                                <p><strong>Phương thức thanh toán:</strong> @(order.TypePayment == 1 ? "COD (Thanh toán khi nhận hàng)" : "Chuyển khoản")</p>
+                                <p><strong>Tiền hàng:</strong> @(((decimal)order.TotalAmount - (decimal)order.ShippingFee).ToString("N0")) VNĐ</p>
+                                <p><strong>Phí vận chuyển:</strong> @order.ShippingFee.ToString("N0") VNĐ</p>
+                                <p><strong>Tổng tiền:</strong> @order.TotalAmount.ToString("N0") VNĐ</p>
+
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr class="text-center">
+                                            <th>Sản phẩm</th>
+                                            <th>Hình ảnh</th>
+                                            <th class="text-center">Số lượng</th>
+                                            <th class="text-end">Đơn giá</th>
+                                            <th class="text-end">Thành tiền</th>
+                                            <th class="text-center">Flash Sale</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in order.OrderDetails)
+                                        {
+                                            <tr class="text-center">
+                                                <td>@item.ProductName</td>
+                                                <td>
+                                                    <img src="@item.Product.Image" alt="Ảnh sản phẩm" style="width: 80px; height: auto; object-fit: cover;">
+                                                </td>
+                                                <td class="text-center">@item.Quantity</td>
+                                                <td class="text-end">@item.Price.ToString("N0") VNĐ</td>
+                                                <td class="text-end">@item.SubTotal.ToString("N0") VNĐ</td>
+                                                <td>
+                                                    @if (item.FlashSale != null)
+                                                    {
+                                                        <span class="text-success fw-bold">@item.FlashSale.Title</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted fst-italic">Không</span>
+                                                    }
+                                                </td>
+
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <a class="btn btn-secondary" asp-action="RevenueStatistics">← Quay lại thống kê</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function exportOrdersToExcel() {
+        const rows = [];
+        var day = "@Model.FirstOrDefault()?.OrderDate.ToString("dd-MM-yyyy")";
+
+        document.querySelectorAll(".order-container").forEach((orderDiv, index) => {
+            const header = orderDiv.querySelector(".card-header").innerText;
+            const info = Array.from(orderDiv.querySelectorAll("p")).map(p => [p.innerText]);
+
+            rows.push([`ĐƠN HÀNG ${index + 1}`], [header], [" "], ...info, [" "]);
+
+            const table = orderDiv.querySelector("table");
+            if (table) {
+                const tableRows = Array.from(table.rows).map((row, rowIndex) => {
+                    const cells = Array.from(row.cells);
+
+                    // Bỏ cột thứ 2 (index = 1) là hình ảnh
+                    const filteredCells = cells
+                        .filter((_, i) => i !== 1)
+                        .map(cell => cell.innerText);
+
+                    return filteredCells;
+                });
+                rows.push(...tableRows, [" "]);
+            }
+
+            rows.push(["====================="], [" "]);
+        });
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(rows);
+        ws['!cols'] = [
+            { wch: 40 }, // Sản phẩm
+            { wch: 12 }, // Số lượng (lúc này thành cột thứ 2)
+            { wch: 20 }, // Đơn giá
+            { wch: 20 }, // Thành tiền
+            { wch: 25 }  // Flash Sale
+        ];
+
+        XLSX.utils.book_append_sheet(wb, ws, "ChiTietDonHang");
+        XLSX.writeFile(wb, `ChiTietDonHang_${day}.xlsx`);
+    }
+</script>
+

@@ -1,0 +1,51 @@
+﻿@model LHBooksWeb.Models.EF.Author
+
+@{
+    ViewBag.Title = "Chỉnh sửa tác giả";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="h3 mb-3 text-gray-800">Quản lý tác giả</h1>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.CreatedDate)
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h5 class="m-0 font-weight-bold text-primary">Chỉnh sửa thông tin tác giả</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Bio" class="control-label"></label>
+                    <textarea asp-for="Bio" class="form-control" id="editor"></textarea>
+                    <span asp-validation-for="Bio" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Lưu</button>
+            <a href="/Admin/Author" class="btn btn-secondary">Hủy</a>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        $(document).ready(function () {
+            CKEDITOR.replace('editor', {
+                customConfig: '~/adminlib/ckeditor/config.js',
+                extraAllowedContent: 'span',
+            });
+        });
+
+    </script>
+}

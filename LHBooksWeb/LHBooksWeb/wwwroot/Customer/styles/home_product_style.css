@@ -1,0 +1,130 @@
+﻿.product-grid_home {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-top: 20px;
+    padding:0px 10px 0px 10px;
+    justify-content: flex-start;
+}
+
+.product-item_hone {
+    width: 20%; /* 100% ÷ 5 = 20% cho mỗi item */
+    height: 380px;
+    cursor: pointer;
+    position: relative;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+}
+
+.product-grid_hone .product-item_hone:nth-child(n+11) {
+    display: none;
+}
+
+.main_content_hone{
+    float:left;
+    width:100%;
+}
+
+
+/*==============================================================*/
+
+:root {
+    --primary-color: #28a745;
+    --secondary-color: #dc3545;
+    --light-pink: #ffebf0;
+    --text-color: #333;
+    --light-gray: #f8f9fa;
+    --border-color: #dee2e6;
+}
+
+
+/* Section Styles */
+section.new_arrivals {
+    margin: 30px 0;
+}
+
+    section.new_arrivals h3 {
+        background-color: var(--light-pink);
+        color: var(--text-color);
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        font-size: 18px;
+        text-transform: uppercase;
+        border-radius: 4px;
+    }
+
+.view-more {
+    text-align: center;
+    margin: 20px 0;
+}
+
+    .view-more button {
+        background-color: white;
+        border: 1px solid var(--border-color);
+        padding: 8px 30px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+        .view-more button:hover {
+            background-color: var(--light-gray);
+        }
+
+/* Featured Books Section with side panel */
+.featured-section {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+}
+
+.side-panel {
+    background-color: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+    .side-panel h4 {
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+/* Partners Section */
+.partners {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    margin: 20px 0;
+    gap: 15px;
+}
+
+.partner-logo {
+    height: 40px;
+    filter: grayscale(100%);
+    opacity: 0.7;
+    transition: all 0.3s;
+}
+
+    .partner-logo:hover {
+        filter: grayscale(0);
+        opacity: 1;
+    }
+
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .featured-section {
+        grid-template-columns: 1fr;
+    }
+
+    .header-top {
+        flex-direction: column;
+    }
+
+    .search-bar {
+        margin: 15px 0;
+        width: 100%;
+    }
+}

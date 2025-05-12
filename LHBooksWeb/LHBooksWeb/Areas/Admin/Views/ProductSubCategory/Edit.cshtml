@@ -1,0 +1,70 @@
+﻿@model ProductSubCategory
+
+@{
+    ViewData["Title"] = "Sửa danh mục phụ";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<h1 class="h3 mb-3 text-gray-800">Quản lý danh mục phụ</h1>
+
+<form asp-area="Admin" asp-controller="ProductSubCategory" asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.CreatedDate)
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h5 class="m-0 font-weight-bold text-primary">Cập nhật thông tin danh mục phụ</h5>
+        </div>
+        <div class="card-body">
+
+            <div class="form-group">
+                <label asp-for="ProductCategoryId" class="control-label">Danh mục chính</label>
+                <select asp-for="ProductCategoryId" class="form-control" asp-items="@(ViewData["ProductCategoryId"] as SelectList)">
+                    <option value="">-- Chọn danh mục chính --</option>
+                </select>
+                <span asp-validation-for="ProductCategoryId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Title" class="control-label">Tiêu đề</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">Mô tả</label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">Lưu lại</button>
+                <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+            </div
+            
+        </div>
+        @if (ViewData.ModelState.ErrorCount > 0)
+            {
+                <div class="alert alert-danger">
+                    <ul>
+                        @foreach (var state in ViewData.ModelState)
+                        {
+                            @foreach (var error in state.Value.Errors)
+                            {
+                                <li>@state.Key: @error.ErrorMessage</li>
+                            }
+                        }
+                    </ul>
+                </div>
+            }
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

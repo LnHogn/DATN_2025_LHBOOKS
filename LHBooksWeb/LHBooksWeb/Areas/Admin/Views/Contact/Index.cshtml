@@ -1,0 +1,57 @@
+﻿@model IEnumerable<ContactModel>
+@{
+    ViewData["Title"] = "Danh mục trang liên hệ";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="h3 mb-3 text-gray-800">Quản lý liên hệ</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h5 class="m-0 font-weight-bold text-primary">Quản lý trang liên hệ</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table" id="myTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Tên</th>
+                        <th>Mô tả</th>
+                        <th>Map</th>
+                        <th>Email</th>
+                        <th>SĐT</th>
+                        <th>Logo</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @if (Model != null && Model.Any())
+                    {
+                        var i = 1;
+                        foreach (var item in Model)
+                        {
+                            <tr id="trow_@item.Name">
+                                <td>@item.Name</td>
+                                <td>@Html.Raw(item.Description)</td>
+                                <td>@Html.Raw(item.Map)</td>
+                                <td>@item.Email</td>
+                                <td>@item.Phone</td>
+                                <td>
+                                    <img class="imgproduct" src="~/Uploads/logo/@item.LogoImg" width="70" onerror="this.onerror=null;" />
+                                </td>
+                                <td>
+                                    <a href="/Admin/Contact/Edit/@item.Name" class="btn btn-primary">Sửa</a>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    
+}

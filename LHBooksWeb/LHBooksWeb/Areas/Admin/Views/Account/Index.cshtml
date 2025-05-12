@@ -1,0 +1,102 @@
+﻿@model IEnumerable<LHBooksWeb.Data.ApplicationUser>
+@{
+    ViewData["Title"] = "Quản lý tài khoản";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="h3 mb-3 text-gray-800">Quản lý tài khoản</h1>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between">
+        <h5 class="m-0 font-weight-bold text-primary">Tài khoản</h5>
+        <a href="/Admin/Account/Create" class="btn btn-primary">Thêm mới</a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table" id="myTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tài khoản</th>
+                        <th>Họ tên</th>
+                        <th>Email</th>
+                        <th>Quyền</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    @if (Model != null && Model.Any())
+                    {
+                        var i = 1;
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@i</td>
+                                <td>@item.UserName</td>
+                                <td>@item.FullName</td>
+                                <td>@item.Email</td>
+                                <td>
+                                    @if (ViewBag.RolesForUsers != null && ViewBag.RolesForUsers.ContainsKey(item.UserName))
+                                    {
+                                        var roles = ViewBag.RolesForUsers[item.UserName];
+                                        foreach (var role in roles)
+                                        {
+                                            <span>@role</span>
+
+                                            <br />
+                                        }
+                                    }
+                                </td>
+                                <td>
+                                    @* <a asp-area="Admin" asp-controller="Account" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Sửa</a> *@
+                                    <button class="btn btn-danger btn-delete" data-id="@item.Id">Xóa</button>
+                                </td>
+                            </tr>
+                            i++;
+                        }
+                    }
+
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(document).on("click", ".btn-delete", function () {
+                var userId = $(this).data("id");
+                if (!userId) {
+                    alert("ID người dùng không hợp lệ.");
+                    return;
+                }
+
+                if (confirm("Bạn có chắc muốn xóa tài khoản này?")) {
+                    $.ajax({
+                        url: '/Admin/Account/DeleteUser', // Đảm bảo đúng tên phương thức controller
+                        type: 'POST',
+                        data: { userId: userId },
+                        headers: {
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                alert("Xóa tài khoản thành công!");
+                                location.reload();
+                            } else {
+                                alert("Lỗi: " + result.message);
+                            }
+                        },
+                        error: function () {
+                            alert("Đã xảy ra lỗi khi kết nối đến server!");
+                        }
+                    });
+                }
+            });
+        });
+
+    </script>
+}
+

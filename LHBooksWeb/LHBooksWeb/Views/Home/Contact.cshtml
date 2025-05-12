@@ -1,0 +1,89 @@
+﻿@model ContactModel
+@{
+    ViewData["Title"] = "Liên hệ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="container contact_container" style="margin-top: 160px;">
+    <div class="row">
+        <div class="col">
+            <!-- Breadcrumbs -->
+            <nav aria-label="breadcrumb" class="mb-2 mt-2">
+                <ol class="breadcrumb bg-light p-3 rounded">
+                    <li class="breadcrumb-item">
+                        <a href="/" >Trang chủ</a>
+                    </li>
+                    <li class="breadcrumb-item " aria-current="page">@ViewData["Title"]</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Contact Info & Map Side by Side -->
+    <div class="row">
+        <!-- Contact Info - Left Column -->
+        <div class="col-lg-6 contact_col">
+            <div class="contact_contents">
+                <h1>@Model.Name</h1>
+                <p>@Html.Raw(Model.Description)</p>
+                <h3>Thông tin liên hệ</h3>
+                <div>
+                    <p>Số điện thoại: @Model.Phone</p>
+                    <p>Email: @Model.Email</p>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.LogoImg))
+                {
+                    <div>
+                        <img src="~/Uploads/logo/@Model.LogoImg" alt="@Model.Name" class="contact-logo" width="70px;" />
+                    </div>
+                }
+            </div>
+            <!-- Follow Us -->
+            <div class="follow_us_contents">
+                <h2>Theo dõi chúng tôi</h2>
+                <ul class="social d-flex flex-row">
+                    <li class="mx-2">
+                        <a href="https://www.facebook.com/profile.php?id=100011260113939" class="social-icon" style="background-color: #3b5998;" target="_blank">
+                            <i class="fab fa-facebook-f fa-lg"></i>
+                        </a>
+
+                    </li>
+                    <li class="mx-2">
+                        <a href="https://www.instagram.com/_.ln_.hong._/" class="social-icon" style="background-color: #e4405f;" target="_blank">
+                            <i class="fab fa-instagram fa-lg"></i>
+                        </a>
+
+                    </li>
+                </ul>
+
+                <style>
+                    .social-icon {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 40px;
+                        height: 40px;
+                        color: white;
+                        border-radius: 50%;
+                        transition: all 0.3s ease;
+                        text-decoration: none;
+                    }
+                        .social-icon:hover {
+                            opacity: 0.8;
+                        }
+                </style>
+
+            </div>
+        </div>
+
+        <!-- Map - Right Column -->
+        <div class="col-lg-6">
+            <div id="google_map" style="height: 100%;">
+                <div class="map_container" style="height: 100%;">
+                    <div id="map" style="height: 100%;">
+                        @Html.Raw(Model.Map)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

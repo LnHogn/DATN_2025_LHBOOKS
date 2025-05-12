@@ -1,0 +1,204 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>LHBooks</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="LHBooks Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="~/Customer/styles/bootstrap4/bootstrap.min.css">
+    @* <link href="~/customer/styles/bootstrap-5.0.2-dist/css/bootstrap.min.css" rel="stylesheet" /> *@
+    <link href="~/customer/plugins/fontawesome-free-6.7.2-web/css/all.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="~/Customer/styles/main_styles.css">
+    <link rel="stylesheet" type="text/css" href="~/Customer/styles/responsive.css">
+    <link href="~/css/site.css" rel="stylesheet" />
+    <link href="~/customer/plugins/jquery-ui-1.12.1.custom/jquery-ui.css" rel="stylesheet" />
+    <link href="~/customer/styles/categories_styles.css" rel="stylesheet" />
+    <link href="~/customer/styles/categories_responsive.css" rel="stylesheet" />
+    <link href="~/customer/styles/menuleft_style.css" rel="stylesheet" />
+    <link href="~/customer/styles/flashsale.css" rel="stylesheet" />
+    <script src="~/Customer/js/jquery-3.2.1.min.js"></script>
+    <link href="~/lib/content/content/toastr.css" rel="stylesheet" />
+    <link href="~/customer/styles/home_product_style.css" rel="stylesheet" />
+    <link href="~/lib/sweetarlet/package/dist/sweetalert2.css" rel="stylesheet" />
+
+</head>
+
+<body>
+    <div class="super_container">
+
+        <!-- Header -->
+
+        <header class="header trans_300">
+
+            <!-- Top Navigation -->
+            @inject UserManager<ApplicationUser> UserManager
+            @using LHBooksWeb.Data
+            @using Microsoft.AspNetCore.Identity
+            <div class="top_nav">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="top_nav_left">Hotline: 0123456789</div>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <div class="top_nav_right">
+                                <ul class="top_nav_menu">
+                                    <li class="account" style="width :250px;">
+                                        @if (User.Identity.IsAuthenticated)
+                                        {
+                                            var currentUser = await UserManager.GetUserAsync(User);
+
+                                            <a href="#">
+                                                Xin chào, @currentUser.UserName
+                                                <i class="fa fa-angle-down"></i>
+                                            </a>
+                                            <ul class="account_selection">
+                                                <li>
+                                                    <a href="/Account/UserProfile">
+                                                        <i class="fas fa-user" aria-hidden="true"></i> Thông tin
+                                                    </a>
+                                                    <a href="/OrderHistory">
+                                                        <i class="fa fa-history" aria-hidden="true"></i> Lịch sử mua hàng
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:document.getElementById('logOffForm').submit()">
+                                                        <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Đăng xuất
+                                                    </a>
+                                                </li>
+                                            </ul>
+
+                                            <form id="logOffForm" asp-controller="Account" asp-action="Logout" method="post" style="display:none;">
+                                                @Html.AntiForgeryToken()
+                                            </form>
+
+                                        }
+
+                                        else
+                                        {
+                                            <a href="#">
+                                                Đăng nhập ngay
+                                                <i class="fa fa-angle-down"></i>
+                                            </a>
+                                            <ul class="account_selection">
+                                                <li><a href="/Account/Login"><i class="fa fa-sign-in" aria-hidden="true"></i>Đăng nhập</a></li>
+                                                <li><a href="/Account/Register"><i class="fa fa-user-plus" aria-hidden="true"></i>Đăng ký</a></li>
+                                            </ul>
+                                        }
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Navigation -->
+
+            <div class="main_nav_container">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <div class="logo_container">
+                                <a href="/">LH<span>Books</span></a>
+                            </div>
+                            <nav class="navbar">
+                                <form id="searchForm" class="d-flex search-box" method="get" action="/Products/Search">
+                                    <input class="form-control me-3" type="search" placeholder="Tìm kiếm sản phẩm..."
+                                           name="search" style="width:450px;"
+                                           title="Nhập tên tác phẩm, tên tác giả"
+                                           value="@ViewBag.SearchKeyword">
+                                    <button class="btn" type="submit">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </form>
+                                <ul class="navbar_menu">
+                                    <li><a href="/">Trang chủ</a></li>
+                                    <li><a href="/Products/Index">Sản phẩm</a></li>
+                                    <li><a href="/Home/Contact">Liên hệ</a></li>
+                                </ul>
+                                
+                                <ul class="navbar_user">
+                                    <li class="checkout">
+                                        <a href="/Cart">
+                                            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                                            <span id="checkout_items" class="checkout_items">0</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="hamburger_container">
+                                    <i class="fa fa-bars" aria-hidden="true"></i>
+                                </div>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </header>
+
+        <div class="fs_menu_overlay"></div>
+        <div class="hamburger_menu">
+            <div class="hamburger_close"><i class="fa fa-times" aria-hidden="true"></i></div>
+            <div class="hamburger_menu_content text-right">
+                <ul class="menu_top_nav">
+                    <li class="menu_item has-children">
+                        <a href="#">
+                            My Account
+                            <i class="fa fa-angle-down"></i>
+                        </a>
+                        <ul class="menu_selection">
+                            <li><a href="#"><i class="fa fa-sign-in" aria-hidden="true"></i>Sign In</a></li>
+                            <li><a href="#"><i class="fa fa-user-plus" aria-hidden="true"></i>Register</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+
+        @RenderBody()
+
+        <footer class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="footer_nav_container d-flex flex-sm-row flex-column align-items-center justify-content-lg-start justify-content-center text-center">
+                            <ul class="footer_nav">
+                                <li><a href="/Home/Contact">Liên hệ ngay</a></li>
+                            </ul>
+                        </div>
+                    </div>                   
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="footer_nav_container">
+                            <div class="cr">©2025. Made by <a href="#">Lâm Nguyên Hồng</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="~/customer/js/cart_custom.js"></script>
+    <script src="~/Customer/styles/bootstrap4/popper.js"></script>
+    <script src="~/Customer/styles/bootstrap4/bootstrap.min.js"></script>
+    <script src="~/Customer/plugins/easing/easing.js"></script>
+    <script src="~/customer/plugins/jquery-ui-1.12.1.custom/jquery-ui.js"></script>
+    <script src="~/Customer/js/custom.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.unobtrusive-ajax.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    @RenderSection("Scripts", required: false)
+    <script src="~/customer/js/menuleft.js"></script>
+    <script src="~/lib/content/scripts/toastr.js"></script>
+    <script src="~/customer/plugins/isotope/isotope.pkgd.min.js"></script>
+    <script src="~/customer/styles/bootstrap4/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/sweetarlet/package/dist/sweetalert2.all.min.js"></script>
+
+</body>
+
+</html>

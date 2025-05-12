@@ -1,0 +1,120 @@
+﻿
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 224px;
+    height: 100vh;
+    background-color: #4e73df;
+    transition: width 0.3s ease-in-out;
+    z-index: 1000;
+}
+
+#sidebar.collapsed {
+    width: 104px;
+}
+
+    /*#content-wrapper {
+            margin-top: 56px;
+            margin-left: 224px;
+            width: calc(100% - 224px);
+            transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+        }*/
+
+    #sidebar.collapsed + #content-wrapper {
+        margin-left: 104px;
+        width: calc(100% - 104px);
+    }
+
+#navbar {
+    position: fixed;
+    top: 0;
+    left: 224px;
+    width: calc(100% - 224px);
+    height: 56px;
+    z-index: 999;
+    transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+#sidebar.collapsed + #navbar {
+    left: 104px;
+    width: calc(100% - 104px);
+}
+
+#content-wrapper.expanded {
+    margin-left: 104px;
+    width: calc(100% - 104px);
+}
+
+
+
+
+#wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+/*#sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 224px;
+            height: 100vh;
+            background-color: #4e73df;
+            transition: width 0.3s ease-in-out;
+            z-index: 1000;
+        }
+
+            #sidebar.collapsed {
+                width: 104px;
+            }*/
+
+#content-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-left: 224px;
+    margin-top: 56px;
+    width: calc(100% - 224px);
+    min-height: 100vh;
+    transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+}
+
+/*#sidebar.collapsed + #content-wrapper {
+            margin-left: 104px;
+            width: calc(100% - 104px);
+        }
+
+        #navbar {
+            position: fixed;
+            top: 0;
+            left: 224px;
+            width: calc(100% - 224px);
+            height: 56px;
+            z-index: 999;
+            transition: left 0.3s ease-in-out, width 0.3s ease-in-out;
+        }
+
+        #sidebar.collapsed + #navbar {
+            left: 104px;
+            width: calc(100% - 104px);
+        }*/
+
+/*#main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }*/
+
+footer {
+    width: 100%;
+    background-color: white;
+    text-align: center;
+    padding: 10px 0;
+    border-top: 1px solid #ddd;
+    margin-top: auto;
+}
+
+
+
+

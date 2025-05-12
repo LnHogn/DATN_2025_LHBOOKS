@@ -1,0 +1,64 @@
+﻿@model LHBooksWeb.Models.ViewModels.CreateAccountViewModel
+@{
+    ViewData["Title"] = "Thêm mới tài khoản";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="h3 mb-3 text-gray-800">Quản lý tài khoản</h1>
+
+<form asp-area="Admin" asp-controller="Account" asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h5 class="m-0 font-weight-bold text-primary">Thêm mới tài khoản</h5>
+        </div>
+        <div class="card-body">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <div class="form-group">
+                <dt>Tên đăng nhập</dt>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <dt>Họ và tên</dt>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <dt>Số điện thoại</dt>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <dt>Email</dt>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <dt>Chọn quyền</dt>
+                <select asp-for="Role" asp-items="@(ViewData["Role"] as SelectList)" class="form-control">
+                    <option value="">- Chọn quyền -</option>
+                </select>
+
+            </div>
+            <div class="form-group">
+                <dt>Mật khẩu</dt>
+                <input asp-for="Password" type="password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <dt>Xác nhận mật khẩu</dt>
+                <input asp-for="ConfirmPassword" type="password" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Lưu</button>
+            <a href="/Admin/Account" class="btn btn-secondary">Hủy</a>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

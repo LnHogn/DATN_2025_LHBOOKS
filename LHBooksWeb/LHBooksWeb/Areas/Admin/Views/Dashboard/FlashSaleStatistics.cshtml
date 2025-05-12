@@ -1,0 +1,203 @@
+﻿@model FlashSaleStatisticsViewModel
+@{
+    ViewData["Title"] = "Thống kê Flash Sale";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Tổng quan Flash Sale</h1>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row d-flex">
+        <div class="col-xl-4 col-md-6 d-flex align-items-stretch">
+            <div class="card bg-primary text-white mb-4 w-100">
+                <div class="card-body">
+                    <h5>Tổng số Flash Sale</h5>
+                    <h2>@Model.TotalFlashSales</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-md-6">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <h5>Flash Sale đang diễn ra</h5>
+                    <h2>@Model.ActiveFlashSales</h2>
+                    <div class="small">@(Model.TotalFlashSales > 0 ? Math.Round((double)Model.ActiveFlashSales / Model.TotalFlashSales * 100, 2) : 0)%</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-4 col-md-6">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">
+                    <h5>Flash Sale sắp diễn ra</h5>
+                    <h2>@Model.UpcomingFlashSales</h2>
+                    <div class="small">@(Model.TotalFlashSales > 0 ? Math.Round((double)Model.UpcomingFlashSales / Model.TotalFlashSales * 100, 2) : 0)%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Cột trái: Biểu đồ phân bố Flash Sale -->
+        <div class="col-xl-6 d-flex">
+            <div class="card shadow mb-4 w-100">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+                    <i class="fas fa-chart-pie mr-1"></i>
+                    <h6 class="m-0 font-weight-bold text-primary">Phân bố Flash Sale</h6>
+                </div>
+                <div class="card-body d-flex justify-content-center align-items-center">
+                    <canvas id="flashSaleDistributionChart" width="100%" height="60"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột phải: Tổng doanh thu dự kiến -->
+        <div class="col-xl-6 d-flex">
+            <div class="card shadow mb-4 w-100">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+                    <i class="fas fa-money-bill-wave mr-1"></i>
+                    <h6 class="m-0 font-weight-bold text-primary">Tổng doanh thu dự kiến</h6>
+                </div>
+                <div class="card-body text-center">
+                    <h2 class="text-primary">@Model.FlashSalePerformance.Sum(f => f.EstimatedRevenue).ToString("N0") đ</h2>
+                    <p class="text-muted">Dự tính từ tất cả các Flash Sale</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+                    <i class="fas fa-chart-bar mr-1"></i>
+                    <h6 class="m-0 font-weight-bold text-primary">Doanh thu dự kiến theo Flash Sale</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="estimatedRevenueChart" width="100%" height="30"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+            <i class="fas fa-table mr-1"></i>
+            <h6 class="m-0 font-weight-bold text-primary">Chi tiết Flash Sale</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="flashtb" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên Flash Sale</th>
+                            <th>Thời gian</th>
+                            <th>Số sản phẩm</th>
+                            <th>Doanh thu dự kiến</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var flashSale in Model.FlashSalePerformance)
+                        {
+                            <tr class="text-center">
+                                <td>@flashSale.FlashSaleId</td>
+                                <td>@flashSale.Title</td>
+                                <td>@flashSale.StartTime.ToString("dd/MM/yyyy HH:mm") - @flashSale.EndTime.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>@flashSale.TotalProducts</td>
+                                <td>@flashSale.EstimatedRevenue.ToString("N0") đ</td>
+                                <td>
+                                    @if (flashSale.EndTime < DateTime.Now)
+                                    {
+                                        <span class="badge badge-secondary">Đã kết thúc</span>
+                                    }
+                                    else if (flashSale.StartTime <= DateTime.Now && flashSale.EndTime >= DateTime.Now)
+                                    {
+                                        <span class="badge badge-success">Đang diễn ra</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-info">Sắp diễn ra</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/adminlib/vendor/chart.js/chart.bundle.js"></script>
+    <script src="~/adminlib/vendor/chart.js/chart.js"></script>
+    <script>
+        // Flash Sale Distribution Chart
+        var distributionCtx = document.getElementById('flashSaleDistributionChart').getContext('2d');
+        var distributionChart = new Chart(distributionCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Đang diễn ra', 'Sắp diễn ra', 'Đã kết thúc'],
+                datasets: [{
+                    data: [
+        @Model.ActiveFlashSales,
+        @Model.UpcomingFlashSales,
+        @(Model.TotalFlashSales - Model.ActiveFlashSales - Model.UpcomingFlashSales)
+                            ],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.5)',
+                        'rgba(54, 162, 235, 0.5)',
+                        'rgba(255, 99, 132, 0.5)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            }
+        });
+
+        // Estimated Revenue Chart
+        var revenueCtx = document.getElementById('estimatedRevenueChart').getContext('2d');
+        var revenueChart = new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: [@Html.Raw(string.Join(",", Model.FlashSalePerformance.Select(f => $"'{f.Title}'").ToArray()))],
+                datasets: [{
+                    label: 'Doanh thu dự kiến (VNĐ)',
+                    data: [@string.Join(",", Model.FlashSalePerformance.Select(f => f.EstimatedRevenue.ToString(System.Globalization.CultureInfo.InvariantCulture)).ToArray())],
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function (value) {
+                                return value.toLocaleString('vi-VN') + ' đ';
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.dataset.label + ': ' + parseFloat(context.raw).toLocaleString('vi-VN') + ' đ';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

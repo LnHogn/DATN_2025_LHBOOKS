@@ -1,0 +1,42 @@
+﻿@model ProductCategory
+
+@{
+    ViewBag.Title = "Thêm mới danh mục chính";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<h1 class="h3 mb-3 text-gray-800">Quản lý danh danh mục chính</h1>
+
+<form asp-area="Admin" asp-controller="ProductCategory" asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    @Html.ValidationSummary(true)
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h5 class="m-0 font-weight-bold text-primary">Thêm danh mục chính</h5>
+        </div>
+        <div class="card-body">
+
+            <div class="form-group">
+                <label for="Title">Tên danh mục chính</label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label for="Description">Mô tả</label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <input type="hidden" id="Alias" name="Alias" />
+            <button type="submit" class="btn btn-primary">Lưu</button>
+            <a href="/Admin/ProductCategory" class="btn btn-secondary">Hủy</a>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        </div>
+    </div>
+</form>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

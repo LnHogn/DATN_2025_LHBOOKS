@@ -1,0 +1,187 @@
+﻿@model EditProfileViewModel
+
+@{
+    ViewData["Title"] = "Cập nhật hông tin tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container py-5">
+    <main aria-labelledby="title" style="margin-top: 120px;">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-light p-3 rounded shadow-sm">
+                <li class="breadcrumb-item">
+                    <a href="/">Trang chủ</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="/Account/UserProfile">Thông tin tài khoản</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">Chỉnh sửa thông tin</li>
+            </ol>
+        </nav>
+
+        <div class="card shadow-sm rounded">
+            <div class="card-header bg-light border-0 text-center">
+                <h3 class="mb-0">Chỉnh sửa thông tin</h3>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="EditProfile" asp-controller="Account" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="form-group mb-3">
+                        <label asp-for="UserName" class="form-label"><strong>Tên đăng nhập</strong></label>
+                        <input asp-for="UserName" class="form-control rounded shadow-sm" readonly />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="FullName" class="form-label"><strong>Họ và tên</strong></label>
+                        <input asp-for="FullName" class="form-control rounded shadow-sm" placeholder="Nhập họ và tên" />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Email" class="form-label"><strong>Email</strong></label>
+                        <input asp-for="Email" class="form-control rounded shadow-sm" placeholder="Nhập email" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Phone" class="form-label"><strong>Số điện thoại</strong></label>
+                        <input asp-for="Phone" class="form-control rounded shadow-sm" placeholder="Nhập số điện thoại" />
+                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="province" class="form-label"><strong>Tỉnh/Thành phố</strong></label>
+                        <select id="province" class="form-control rounded shadow-sm"></select>
+                        <input type="hidden" id="ProvinceName" name="Province" value="@Model.Province" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="district" class="form-label"><strong>Quận/Huyện</strong></label>
+                        <select id="district" class="form-control rounded shadow-sm" disabled></select>
+                        <input type="hidden" id="DistrictName" name="District" value="@Model.District" />
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="ward" class="form-label"><strong>Xã/Phường</strong></label>
+                        <select id="ward" class="form-control rounded shadow-sm" disabled></select>
+                        <input type="hidden" id="WardName" name="Ward" value="@Model.Ward" />
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="SpecificAddress" class="form-label"><strong>Địa chỉ cụ thể</strong></label>
+                        <input asp-for="SpecificAddress" class="form-control rounded shadow-sm" placeholder="Nhập địa chỉ cụ thể" />
+                    </div>
+
+                    <input type="hidden" asp-for="Address" id="Address" />
+
+                    <div class="d-flex justify-content-start">
+                        <button type="submit" class="btn btn-primary mr-2"><i class="fa fa-save"></i> Lưu thay đổi</button>
+                        <a asp-action="UserProfile" asp-controller="Account" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Quay lại</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Giả sử các giá trị model được gửi dưới dạng object có tên `modelData`
+            const modelData = {
+                provinceName: '@Html.Raw(Model.Province)',
+                districtName: '@Html.Raw(Model.District)',
+                wardName: '@Html.Raw(Model.Ward)',
+                specificAddress: '@Html.Raw(Model.SpecificAddress)'
+            };
+
+            const provinceDropdown = $('#province');
+            const districtDropdown = $('#district');
+            const wardDropdown = $('#ward');
+
+            // Hàm chọn dropdown theo text
+            function selectDropdownByText(dropdown, textToMatch) {
+                dropdown.find('option').each(function () {
+                    if ($(this).text().trim() === textToMatch.trim()) {
+                        $(this).prop('selected', true).change();
+                        return false;
+                    }
+                });
+            }
+
+            // Load tỉnh
+            $.getJSON('/Account/GetProvinces', function (provinces) {
+                provinces.forEach(p => {
+                    provinceDropdown.append(`<option value="${p.code}">${p.name}</option>`);
+                });
+
+                if (modelData.provinceName) {
+                    selectDropdownByText(provinceDropdown, modelData.provinceName);
+                }
+            });
+
+            // Khi chọn tỉnh, load huyện
+            provinceDropdown.change(function () {
+                const selectedProvince = provinceDropdown.find('option:selected').text();
+                districtDropdown.html('<option value="">Chọn quận/huyện</option>').prop('disabled', true);
+                wardDropdown.html('<option value="">Chọn xã/phường</option>').prop('disabled', true);
+
+                if (selectedProvince) {
+                    $.getJSON(`/Account/GetDistricts?provinceName=${selectedProvince}`, function (districts) {
+                        districts.forEach(d => {
+                            districtDropdown.append(`<option value="${d.code}">${d.name}</option>`);
+                        });
+                        districtDropdown.prop('disabled', false);
+
+                        if (modelData.districtName) {
+                            selectDropdownByText(districtDropdown, modelData.districtName);
+                        }
+                    });
+                }
+            });
+
+            // Khi chọn huyện, load xã
+            districtDropdown.change(function () {
+                const selectedDistrict = districtDropdown.find('option:selected').text();
+                wardDropdown.html('<option value="">Chọn xã/phường</option>').prop('disabled', true);
+
+                if (selectedDistrict) {
+                    $.getJSON(`/Account/GetWards?districtName=${selectedDistrict}`, function (wards) {
+                        wards.forEach(w => {
+                            wardDropdown.append(`<option value="${w.code}">${w.name}</option>`);
+                        });
+                        wardDropdown.prop('disabled', false);
+
+                        if (modelData.wardName) {
+                            selectDropdownByText(wardDropdown, modelData.wardName);
+                        }
+                    });
+                }
+            });
+
+            // Khi form được submit, gán thông tin địa chỉ đầy đủ
+            $('form').submit(function () {
+                let province = $('#province option:selected').text();
+                let district = $('#district option:selected').text();
+                let ward = $('#ward option:selected').text();
+                let specificAddress = $('#specificAddress').val();
+
+                // Gán địa chỉ đầy đủ
+                $('#Address').val(`${specificAddress}, ${ward}, ${district}, ${province}`);
+
+                // Gán name vào hidden input
+                $('#ProvinceName').val(province);
+                $('#DistrictName').val(district);
+                $('#WardName').val(ward);
+            });
+
+            // Điền giá trị địa chỉ cụ thể từ model vào trường input
+            if (modelData.specificAddress) {
+                $('#specificAddress').val(modelData.specificAddress);
+            }
+        });
+    </script>
+
+}
