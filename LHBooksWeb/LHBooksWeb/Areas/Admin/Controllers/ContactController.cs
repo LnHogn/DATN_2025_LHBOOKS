@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 namespace LHBooksWeb.Areas.Admin.Controllers
 {
 	[Area("Admin")]
-	[Authorize(Roles = "Admin")]
+	[Authorize(Roles = "Admin,Manager")]
 	public class ContactController : BaseController
 	{
 		private readonly ApplicationDbContext _context;

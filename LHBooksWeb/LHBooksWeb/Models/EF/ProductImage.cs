@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LHBooksWeb.Models.EF
 {
-    [Table("tb_ProductImage")]
+    [Table("ProductImage")]
     public class ProductImage
     {
         [Key]

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LHBooksWeb.Models.EF
 {
-    [Table("tb_OrderDetail")]
+    [Table("OrderDetail")]
     [PrimaryKey(nameof(OrderId), nameof(ProductId))]
     public class OrderDetail
     {

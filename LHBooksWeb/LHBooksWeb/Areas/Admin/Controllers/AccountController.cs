@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace LHBooksWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
     public class AccountController : BaseController
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -42,6 +41,8 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         //    var users = await _dbContext.Users.ToListAsync();
         //    return View(users);
         //}
+
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var users = await _dbContext.Users.ToListAsync();
@@ -68,6 +69,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
 
 
 
+        [Authorize(Roles = "Admin")]
 
         public async Task<IActionResult> Create()
         {
@@ -88,7 +90,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                 if (!roleExists)
                 {
                     ModelState.AddModelError("Role", "Quyền được chọn không hợp lệ.");
-                    TempData["ToastrError"] = "Quyền được chọn không hợp lệ.";
+                    TempData["ErrorMessage"] = "Quyền được chọn không hợp lệ.";
                     await LoadRolesAsync(model.Role); // Load lại roles và giữ lại lựa chọn cũ (nếu có thể)
                     return View(model);
                 }
@@ -98,6 +100,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                 {
                     UserName = model.UserName,
                     Email = model.Email,
+                    isActive = true,
                     PhoneNumber = model.Phone,
                     FullName = model.FullName, // Gán FullName nếu có trong ApplicationUser
                     EmailConfirmed = true // Hoặc false nếu bạn muốn quy trình xác thực email
@@ -118,7 +121,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                     {
                         _logger.LogInformation($"User {user.UserName} added to role {model.Role}."); // Ghi log gán role thành công
                         // Thành công, chuyển hướng đến trang danh sách tài khoản (hoặc trang khác)
-                        TempData["ToastrSuccess"] = $"Tạo tài khoản {user.UserName} thành công!";
+                        TempData["SuccessMessage"] = $"Tạo tài khoản {user.UserName} thành công!";
                         return RedirectToAction("Index", "Account"); // Hoặc tên controller quản lý user của bạn
                     }
                     else
@@ -131,7 +134,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                             ModelState.AddModelError(string.Empty, error.Description);
                             _logger.LogError($"Error detail: {error.Code} - {error.Description}");
                         }
-                        TempData["ToastrError"] = $"Đã tạo người dùng nhưng không thể gán quyền {model.Role}.";
+                        TempData["ErrorMessage"] = $"Đã tạo người dùng nhưng không thể gán quyền {model.Role}.";
                         // Lưu ý: User đã được tạo, nhưng chưa có Role.
                         // Cân nhắc xóa user vừa tạo nếu việc gán role là bắt buộc và thất bại.
                         // await _userManager.DeleteAsync(user); // Cân nhắc kỹ lưỡng khi dùng lệnh này
@@ -147,12 +150,12 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                         ModelState.AddModelError(string.Empty, error.Description);
                         _logger.LogError($"Error detail: {error.Code} - {error.Description}");
                     }
-                    TempData["ToastrError"] = "Không thể tạo tài khoản. Vui lòng kiểm tra thông tin.";
+                    TempData["ErrorMessage"] = "Không thể tạo tài khoản. Vui lòng kiểm tra thông tin.";
                 }
             }
             else
             {
-                TempData["ToastrError"] = "Thông tin không hợp lệ. Vui lòng kiểm tra lại.";
+                TempData["ErrorMessage"] = "Thông tin không hợp lệ. Vui lòng kiểm tra lại.";
             }
 
             // Nếu có lỗi (ModelState không valid hoặc tạo user/gán role thất bại), load lại roles và hiển thị lại form
@@ -174,7 +177,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         {
             if (!ModelState.IsValid)
             {
-                TempData["ToastrError"] = "Thông tin đăng nhập không hợp lệ.";
+                TempData["ErrorMessage"] = "Thông tin đăng nhập không hợp lệ.";
                 return View(model);
             }
 
@@ -183,14 +186,20 @@ namespace LHBooksWeb.Areas.Admin.Controllers
             if (result.Succeeded)
             {
                 _logger.LogInformation("Người dùng {UserName} đăng nhập thành công.", model.UserName);
-                TempData["ToastrSuccess"] = $"Xin chào, {model.UserName}! Đăng nhập thành công.";
+                TempData["SuccessMessage"] = $"Xin chào, {model.UserName}! Đăng nhập thành công.";
                 return RedirectToLocal(returnUrl);
             }
 
             if (result.IsLockedOut)
             {
                 _logger.LogWarning("Tài khoản {UserName} bị khóa.", model.UserName);
-                TempData["ToastrError"] = "Tài khoản đã bị khóa. Vui lòng thử lại sau.";
+                TempData["ErrorMessage"] = "Tài khoản đã bị khóa. Vui lòng thử lại sau.";
+                return View("Lockout");
+            }
+            if (result.IsLockedOut)
+            {
+                _logger.LogWarning("Tài khoản {UserName} bị khóa.", model.UserName);
+                TempData["ErrorMessage"] = "Tài khoản đã bị khóa. Vui lòng thử lại sau.";
                 return View("Lockout");
             }
 
@@ -204,7 +213,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
 
             _logger.LogWarning("Đăng nhập thất bại cho người dùng {UserName}.", model.UserName);
             ModelState.AddModelError(string.Empty, "Đăng nhập không thành công. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
-            TempData["ToastrError"] = "Đăng nhập không thành công. Vui lòng kiểm tra lại tài khoản và mật khẩu.";
+            TempData["ErrorMessage"] = "Đăng nhập không thành công. Vui lòng kiểm tra lại tài khoản và mật khẩu.";
             return View(model);
         }
 
@@ -226,8 +235,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         public async Task<IActionResult> LogOut()
         {
             await _signInManager.SignOutAsync();
-            TempData["ToastrInfo"] = "Bạn đã đăng xuất thành công.";
-            return RedirectToAction("Index", "Dashboard");
+            return RedirectToAction("LoginAdmin");
         }
 
         private void AddErrors(IdentityResult result)
@@ -249,7 +257,9 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         // POST: Admin/Account/Delete
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteUser(string userId)
+        [Authorize(Roles = "Admin")]
+
+        public async Task<IActionResult> UpdateUserStatus(string userId)
         {
             if (string.IsNullOrEmpty(userId))
             {
@@ -262,16 +272,52 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                 return Json(new { success = false, message = "Người dùng không tồn tại.", toastr = "error" });
             }
 
-            var result = await _userManager.DeleteAsync(user);
+            // Cập nhật trạng thái IsActive của người dùng thành false
+            user.isActive = false;
+
+            var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
-                _logger.LogInformation($"User {user.UserName} deleted successfully.");
-                TempData["ToastrSuccess"] = $"Xóa người dùng {user.UserName} thành công.";
-                return Json(new { success = true, message = "Xóa người dùng thành công.", toastr = "success" });
+                _logger.LogInformation($"User {user.UserName} status updated successfully.");
+                TempData["SuccessMessage"] = $"Cập nhật trạng thái người dùng {user.UserName} thành công.";
+                return Json(new { success = true, message = "Cập nhật trạng thái người dùng thành công.", toastr = "success" });
             }
 
-            _logger.LogError($"Error deleting user {user.UserName}.");
-            return Json(new { success = false, message = "Xóa người dùng thất bại.", errors = result.Errors, toastr = "error" });
+            _logger.LogError($"Error updating status for user {user.UserName}.");
+            return Json(new { success = false, message = "Cập nhật trạng thái người dùng thất bại.", errors = result.Errors, toastr = "error" });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+
+        public async Task<IActionResult> EnableUserStatus(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Json(new { success = false, message = "ID người dùng không hợp lệ.", toastr = "error" });
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "Người dùng không tồn tại.", toastr = "error" });
+            }
+
+            // Cập nhật trạng thái IsActive của người dùng thành false
+            user.isActive = true;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                _logger.LogInformation($"User {user.UserName} status updated successfully.");
+                TempData["SuccessMessage"] = $"Cập nhật trạng thái người dùng {user.UserName} thành công.";
+                return Json(new { success = true, message = "Cập nhật trạng thái người dùng thành công.", toastr = "success" });
+            }
+
+            _logger.LogError($"Error updating status for user {user.UserName}.");
+            return Json(new { success = false, message = "Cập nhật trạng thái người dùng thất bại.", errors = result.Errors, toastr = "error" });
         }
 
         [AllowAnonymous]
@@ -281,6 +327,31 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         }
 
 
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Details(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return NotFound();
+
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var viewModel = new UserDetailViewModel
+            {
+                Id = user.Id,
+                UserName = user.UserName,
+                FullName = user.FullName, // cần mở rộng class ApplicationUser
+                PhoneNumber = user.PhoneNumber,
+                Email = user.Email,
+                Role = roles.FirstOrDefault() ?? "Không có",
+                isActive = user.isActive ? "Hoạt động" : "Không hoạt động"
+            };
+
+            return View(viewModel);
+        }
 
     }
 }

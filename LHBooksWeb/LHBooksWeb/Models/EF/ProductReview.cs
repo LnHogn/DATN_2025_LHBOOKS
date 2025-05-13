@@ -4,7 +4,7 @@ using LHBooksWeb.Data;
 
 namespace LHBooksWeb.Models.EF
 {
-    [Table("tb_ProductReview")]
+    [Table("ProductReview")]
     public class ProductReview : BaseEntity
     {
         [Key]

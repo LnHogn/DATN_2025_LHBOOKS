@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TextTemplating;
 namespace LHBooksWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager,Employee")]
     public class ProductsController : BaseController
     {
         private readonly ApplicationDbContext _context;

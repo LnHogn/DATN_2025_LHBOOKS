@@ -25,8 +25,9 @@
             </div>
             <div class="card-body p-4">
                 <form asp-action="EditProfile" asp-controller="Account" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     @Html.AntiForgeryToken()
-
+                    
                     <div class="form-group mb-3">
                         <label asp-for="UserName" class="form-label"><strong>Tên đăng nhập</strong></label>
                         <input asp-for="UserName" class="form-control rounded shadow-sm" readonly />
@@ -71,14 +72,27 @@
                     <div class="form-group mb-4">
                         <label asp-for="SpecificAddress" class="form-label"><strong>Địa chỉ cụ thể</strong></label>
                         <input asp-for="SpecificAddress" class="form-control rounded shadow-sm" placeholder="Nhập địa chỉ cụ thể" />
+                        <span asp-validation-for="SpecificAddress" class="text-danger small"></span>
                     </div>
 
                     <input type="hidden" asp-for="Address" id="Address" />
 
-                    <div class="d-flex justify-content-start">
-                        <button type="submit" class="btn btn-primary mr-2"><i class="fa fa-save"></i> Lưu thay đổi</button>
-                        <a asp-action="UserProfile" asp-controller="Account" class="btn btn-secondary"><i class="fa fa-arrow-left"></i> Quay lại</a>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fa fa-save"></i> Lưu thay đổi
+                            </button>
+                            <a asp-action="ChangePassword" asp-controller="Account" class="btn btn-warning">
+                                <i class="fa fa-key"></i> Đổi mật khẩu
+                            </a>
+                        </div>
+                        <div>
+                            <a asp-action="UserProfile" asp-controller="Account" class="btn btn-secondary">
+                                <i class="fa fa-arrow-left"></i> Quay lại
+                            </a>
+                        </div>
                     </div>
+
                 </form>
             </div>
         </div>
@@ -87,6 +101,10 @@
 
 
 @section scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
     <script>
         $(document).ready(function () {
             // Giả sử các giá trị model được gửi dưới dạng object có tên `modelData`

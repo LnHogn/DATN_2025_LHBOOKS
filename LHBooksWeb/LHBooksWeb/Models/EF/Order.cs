@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LHBooksWeb.Models.EF
 {
-    [Table("tb_Order")]
+    [Table("Orders")]
     public class Order : BaseEntity
     {
         [Key]

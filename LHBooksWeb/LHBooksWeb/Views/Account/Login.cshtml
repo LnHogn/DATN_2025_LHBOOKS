@@ -9,7 +9,12 @@
         <h2 class="text-center mb-4" style="font-size: 2rem;">Đăng nhập</h2>
 
         <form asp-action="Login" method="post">
-
+            @if (ViewBag.IsLockedMessage != null)
+            {
+                <div class="alert alert-danger">
+                    @ViewBag.IsLockedMessage
+                </div>
+            }
             <div class="form-group mb-4">
                 <label asp-for="UserName" class="form-label" style="font-size: 1.1rem;"></label>
                 <input asp-for="UserName" class="form-control" placeholder="Nhập tên đăng nhập" style="font-size: 1.1rem;" />
@@ -41,7 +46,7 @@
             <small style="font-size: 1.1rem;">Chưa có tài khoản? <a asp-action="Register">Đăng ký</a></small>
         </div>
         <div class="text-center mt-3">
-            <small style="font-size: 1.1rem;">Quên mật khẩu? <a asp-action="ForgotPassword">Lấy lại mật khẩu</a></small>
+            <small style="font-size: 1.1rem;"> <a asp-action="ForgotPassword">Quên mật khẩu?</a></small>
         </div>
     </div>
 </div>

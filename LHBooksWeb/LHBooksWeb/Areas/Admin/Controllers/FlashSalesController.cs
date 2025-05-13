@@ -8,7 +8,7 @@ using System;
 namespace LHBooksWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager")]
     public class FlashSalesController : BaseController
     {
         private readonly ApplicationDbContext _context;

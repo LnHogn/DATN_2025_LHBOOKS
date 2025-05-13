@@ -86,16 +86,24 @@ namespace LHBooksWeb.Models.ViewModels
         [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "Số điện thoại không được để trống")]
-        [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
+        [Required(ErrorMessage = "Vui lòng nhập sđt.")]
+        [RegularExpression(@"^\d{10,11}$", ErrorMessage = "Số điện thoại chỉ được chứa chữ số và có độ dài 10–11 số.")]
+        [Display(Name = "Số điện thoại")]
         public string Phone { get; set; }
-
         public string UserName { get; set; } // Không cho chỉnh sửa tên đăng nhập
 
         public string Address { get; set; } // Địa chỉ đầy đủ
+
+        [Required(ErrorMessage = "Tỉnh/Thành không được để trống")]
         public string Province { get; set; }  // Tỉnh/Thành phố
+
+        [Required(ErrorMessage = "Quận/Huyện không được để trống")]
         public string District { get; set; }  // Quận/Huyện
+
+        [Required(ErrorMessage = "Phường/Xã không được để trống")]
         public string Ward { get; set; }      // Xã/Phường
+
+        [Required(ErrorMessage = "Địa chỉ cụ thể không được để trống")]
         public string SpecificAddress { get; set; } // Địa chỉ cụ thể
     }
 
@@ -144,29 +152,6 @@ namespace LHBooksWeb.Models.ViewModels
     }
 
 
-    //public class RegisterViewModel
-    //{
-    //    [Required]
-    //    [EmailAddress]
-    //    [Display(Name = "Email")]
-    //    public string Email { get; set; }
-
-    //    [Required]
-    //    [Display(Name = "Tên đăng nhập")]
-    //    public string UserName { get; set; }
-
-    //    [Required]
-    //    [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
-    //    [DataType(DataType.Password)]
-    //    [Display(Name = "Password")]
-    //    public string Password { get; set; }
-
-    //    [DataType(DataType.Password)]
-    //    [Display(Name = "Confirm password")]
-    //    [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-    //    public string ConfirmPassword { get; set; }
-    //}
-
     public class ResetPasswordViewModel
     {
         [Required]
@@ -198,5 +183,40 @@ namespace LHBooksWeb.Models.ViewModels
         public string Email { get; set; }
 
     }
+
+    public class ChangePasswordViewModel
+    {
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu hiện tại.")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Mật khẩu hiện tại")]
+        public string CurrentPassword { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới.")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Mật khẩu mới")]
+        [StringLength(100, ErrorMessage = "Mật khẩu phải có ít nhất {2} ký tự.", MinimumLength = 6)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$", ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự, chứa ít nhất một chữ cái viết thường, một chữ cái viết hoa và một ký tự đặc biệt.")]
+
+        public string NewPassword { get; set; }
+
+        [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu mới.")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Xác nhận mật khẩu mới")]
+        [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp.")]
+        public string ConfirmPassword { get; set; }
+    }
+
+    public class UserDetailViewModel
+    {
+        public string Id { get; set; }
+        public string UserName { get; set; }
+        public string FullName { get; set; } // Giả sử bạn có trường này thêm vào IdentityUser
+        public string PhoneNumber { get; set; }
+        public string Email { get; set; }
+        public string Role { get; set; }
+
+        public string isActive { get; set; }
+    }
+
 
 }

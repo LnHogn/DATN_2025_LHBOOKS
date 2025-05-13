@@ -13,12 +13,12 @@ namespace LHBooksWeb.Models.ViewModels
         public string UserName { get; set; }
 
 		[Required(ErrorMessage = "Vui lòng nhập Email.")]
-		[EmailAddress]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ.")]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
 		[Required(ErrorMessage = "Vui lòng nhập sđt.")]
-		[Phone]
+        [RegularExpression(@"^\d{10,11}$", ErrorMessage = "Số điện thoại chỉ được chứa chữ số và có độ dài 10–11 số.")]
         [Display(Name = "Số điện thoại")]
         public string Phone { get; set; }
 

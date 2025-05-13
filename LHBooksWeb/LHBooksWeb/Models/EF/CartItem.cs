@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LHBooksWeb.Models.EF
 {
-    [Table("tb_CartItem")]
+    [Table("CartItem")]
     public class CartItem
     {
         [Key]

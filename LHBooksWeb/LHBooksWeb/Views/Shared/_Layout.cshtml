@@ -50,7 +50,7 @@
                                             var currentUser = await UserManager.GetUserAsync(User);
 
                                             <a href="#">
-                                                Xin chào, @currentUser.UserName
+                                                 Xin chào, @currentUser.UserName
                                                 <i class="fa fa-angle-down"></i>
                                             </a>
                                             <ul class="account_selection">
@@ -198,7 +198,28 @@
     <script src="~/customer/plugins/isotope/isotope.pkgd.min.js"></script>
     <script src="~/customer/styles/bootstrap4/bootstrap.bundle.min.js"></script>
     <script src="~/lib/sweetarlet/package/dist/sweetalert2.all.min.js"></script>
+    <script>
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "timeOut": "2000"
+        };
+    </script>
 
+    <!-- Toastr rendering từ TempData -->
+    <script>
+        $(function () {
+            var success = '@TempData["Success"]';
+            var error = '@TempData["Error"]';
+            if (success) {
+                toastr.success(success);
+            }
+            if (error) {
+                toastr.error(error);
+            }
+        });
+    </script>
 </body>
 
 </html>

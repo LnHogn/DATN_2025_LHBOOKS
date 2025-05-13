@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LHBooksWeb.Models.EF
 {
-    [Table("tb_ProductSubCategory")]
+    [Table("ProductSubCategory")]
     public class ProductSubCategory : BaseEntity
     {
         public ProductSubCategory()
