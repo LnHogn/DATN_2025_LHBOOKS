@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace LHBooksWeb.Models.EF
 {
-    [Table("tb_Publisher")]
+    [Table("Publisher")]
     public class Publisher : BaseEntity
     {
         [Key]

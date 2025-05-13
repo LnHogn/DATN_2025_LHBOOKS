@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LHBooksWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager,Employee")]
     public class ProductCategoryController : BaseController
     {
         private readonly ApplicationDbContext db;

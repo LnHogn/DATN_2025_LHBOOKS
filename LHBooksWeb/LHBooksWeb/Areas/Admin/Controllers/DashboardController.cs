@@ -28,7 +28,6 @@ namespace LHBooksWeb.Areas.Admin.Controllers
 {
 
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
     public class DashboardController : BaseController
     {
         private readonly ApplicationDbContext _context;
@@ -58,6 +57,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
 
         // Orders Statistics
 
+        [Authorize(Roles = "Admin,Manager")]
 
         public async Task<IActionResult> OrderStatistics(DateTime? startDate, DateTime? endDate)
         {
@@ -88,6 +88,8 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         }
 
         // Product Statistics
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> ProductStatistics()
         {
             var outOfStockList = await _context.Products
@@ -117,6 +119,8 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         }
 
         // Flash Sale Statistics
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> FlashSaleStatistics()
         {
             var flashSaleStats = new FlashSaleStatisticsViewModel
@@ -133,6 +137,8 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         }
 
         // Revenue Statistics
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> RevenueStatistics(DateTime? startDate, DateTime? endDate)
         {
             var start = startDate ?? DateTime.Now.AddMonths(-1);
@@ -150,6 +156,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
 
             return View(revenueStats);
         }
+        [Authorize(Roles = "Admin,Manager")]
 
         public async Task<IActionResult> DailyOrderDetails(DateTime date)
         {
@@ -170,6 +177,8 @@ namespace LHBooksWeb.Areas.Admin.Controllers
 
 
         // Customer Statistics
+        [Authorize(Roles = "Admin,Manager")]
+
         public async Task<IActionResult> CustomerStatistics()
         {
             var customerStats = new CustomerStatisticsViewModel

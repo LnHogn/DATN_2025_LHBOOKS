@@ -156,7 +156,7 @@
                     <th>Giá Flash</th>
                     <th>Số lượng</th>
                     <th>Đã bán</th>
-                    <th></th>
+                    @* <th></th> *@
                 </tr>
             </thead>
             <tbody>
@@ -168,12 +168,12 @@
                         <td>@item.FlashPrice.ToString("N0")</td>
                         <td>@item.QuantityLimit</td>
                         <td>@item.Sold</td>
-                        <td>
+@*                         <td>
                             <form asp-area="Admin" asp-controller="FlashSales" asp-action="RemoveProduct" method="post" style="display:inline;">
                                 <input type="hidden" name="flashSaleProductId" value="@item.Id" />
                                 <button class="btn btn-danger btn-sm" type="submit">Xoá</button>
                             </form>
-                        </td>
+                        </td> *@
                     </tr>
                 }
             </tbody>

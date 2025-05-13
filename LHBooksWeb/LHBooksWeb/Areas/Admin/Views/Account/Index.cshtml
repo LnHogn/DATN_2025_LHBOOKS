@@ -48,15 +48,16 @@
                                     }
                                 </td>
                                 <td>
-                                    @* <a asp-area="Admin" asp-controller="Account" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">Sửa</a> *@
-                                    <button class="btn btn-danger btn-delete" data-id="@item.Id">Xóa</button>
+                                    <a asp-area="Admin" asp-controller="Account" asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">
+                                        Chi tiết
+                                    </a>
+                                    <button class="btn btn-warning btn-sm btn-deactivate" data-id="@item.Id">Vô hiệu hóa</button>
+                                    <button class="btn btn-success btn-sm btn-activate" data-id="@item.Id">Kích hoạt</button>
                                 </td>
                             </tr>
                             i++;
                         }
-                    }
-
-                    
+                    }                  
                 </tbody>
             </table>
         </div>
@@ -66,37 +67,122 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $(document).on("click", ".btn-delete", function () {
+            $(document).on("click", ".btn-deactivate", function () {
                 var userId = $(this).data("id");
                 if (!userId) {
-                    alert("ID người dùng không hợp lệ.");
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'ID người dùng không hợp lệ.'
+                    });
                     return;
                 }
 
-                if (confirm("Bạn có chắc muốn xóa tài khoản này?")) {
-                    $.ajax({
-                        url: '/Admin/Account/DeleteUser', // Đảm bảo đúng tên phương thức controller
-                        type: 'POST',
-                        data: { userId: userId },
-                        headers: {
-                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-                        },
-                        success: function (result) {
-                            if (result.success) {
-                                alert("Xóa tài khoản thành công!");
-                                location.reload();
-                            } else {
-                                alert("Lỗi: " + result.message);
+                Swal.fire({
+                    title: 'Bạn có chắc muốn vô hiệu hóa tài khoản này?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/Admin/Account/UpdateUserStatus',
+                            type: 'POST',
+                            data: { userId: userId },
+                            headers: {
+                                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                            },
+                            success: function (result) {
+                                if (result.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Thành công',
+                                        text: 'Cập nhật trạng thái tài khoản thành công!'
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Lỗi',
+                                        text: 'Lỗi: ' + result.message
+                                    });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi',
+                                    text: 'Đã xảy ra lỗi khi kết nối đến server!'
+                                });
                             }
-                        },
-                        error: function () {
-                            alert("Đã xảy ra lỗi khi kết nối đến server!");
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             });
         });
-
     </script>
+
+    <script>
+        $(document).ready(function () {
+            $(document).on("click", ".btn-activate", function () {
+                var userId = $(this).data("id");
+                if (!userId) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Lỗi',
+                        text: 'ID người dùng không hợp lệ.'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Bạn có chắc muốn kích hoạt tài khoản này?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Đồng ý',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: '/Admin/Account/EnableUserStatus',
+                            type: 'POST',
+                            data: { userId: userId },
+                            headers: {
+                                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                            },
+                            success: function (result) {
+                                if (result.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Thành công',
+                                        text: 'Cập nhật trạng thái tài khoản thành công!'
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Lỗi',
+                                        text: 'Lỗi: ' + result.message
+                                    });
+                                }
+                            },
+                            error: function () {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi',
+                                    text: 'Đã xảy ra lỗi khi kết nối đến server!'
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+
+
 }
 

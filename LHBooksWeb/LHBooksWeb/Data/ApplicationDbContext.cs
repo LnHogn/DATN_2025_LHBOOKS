@@ -13,6 +13,8 @@ namespace LHBooksWeb.Data
         public string FullName { get; set; }
         public string? Address { get; set; }
 
+        public bool isActive { get; set; }
+
         // Cập nhật phương thức GenerateUserIdentity để trả về ClaimsIdentity đúng
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {

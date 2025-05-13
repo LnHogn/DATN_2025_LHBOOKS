@@ -4,6 +4,7 @@ using LHBooksWeb.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LHBooksWeb.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250513164320_changeName")]
+    partial class changeName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,9 +84,6 @@ namespace LHBooksWeb.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<bool>("isActive")
-                        .HasColumnType("bit");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -127,7 +127,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Author", (string)null);
+                    b.ToTable("Author");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.CartItem", b =>
@@ -166,7 +166,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItem", (string)null);
+                    b.ToTable("tb_CartItem");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.ContactModel", b =>
@@ -195,7 +195,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasKey("Name");
 
-                    b.ToTable("Contact", (string)null);
+                    b.ToTable("Contact");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.FlashSale", b =>
@@ -233,7 +233,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FlashSales", (string)null);
+                    b.ToTable("FlashSales");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.FlashSaleProduct", b =>
@@ -265,7 +265,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("FlashSaleProducts", (string)null);
+                    b.ToTable("FlashSaleProducts");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.Order", b =>
@@ -332,7 +332,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("tb_Order");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.OrderDetail", b =>
@@ -362,7 +362,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderDetail", (string)null);
+                    b.ToTable("tb_OrderDetail");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.Product", b =>
@@ -477,7 +477,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasIndex("PublisherId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("tb_Product");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.ProductCategory", b =>
@@ -515,7 +515,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ProductCategory", (string)null);
+                    b.ToTable("tb_ProductCategory");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.ProductImage", b =>
@@ -540,7 +540,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductImage", (string)null);
+                    b.ToTable("tb_ProductImage");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.ProductReview", b =>
@@ -586,7 +586,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ProductReview", (string)null);
+                    b.ToTable("tb_ProductReview");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.ProductSubCategory", b =>
@@ -629,7 +629,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasIndex("ProductCategoryId");
 
-                    b.ToTable("ProductSubCategory", (string)null);
+                    b.ToTable("tb_ProductSubCategory");
                 });
 
             modelBuilder.Entity("LHBooksWeb.Models.EF.Publisher", b =>
@@ -662,7 +662,7 @@ namespace LHBooksWeb.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Publisher", (string)null);
+                    b.ToTable("tb_Publisher");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

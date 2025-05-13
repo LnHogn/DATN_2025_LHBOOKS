@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using LHBooksWeb.Services.Email;
+using Microsoft.EntityFrameworkCore;
+using DocumentFormat.OpenXml.Spreadsheet;
 namespace LHBooksWeb.Controllers
 {
     [AllowAnonymous]
@@ -41,10 +43,26 @@ namespace LHBooksWeb.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+
+            var user = await _userManager.FindByNameAsync(model.UserName);
+
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Tài khoản không tồn tại.");
+                return View(model);
+            }
+
+            // Check if user is active
+            if (!user.isActive)
+            {
+                ViewBag.IsLockedMessage = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.";
+                return View(model);
+            }
+
             var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, false);
+
             if (result.Succeeded)
             {
-                var user = await _userManager.FindByNameAsync(model.UserName);
                 var roles = await _userManager.GetRolesAsync(user);
 
                 if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -81,6 +99,30 @@ namespace LHBooksWeb.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
+            // Kiểm tra email đã tồn tại
+            var existingEmailUser = await _userManager.FindByEmailAsync(model.Email);
+            if (existingEmailUser != null)
+            {
+                ModelState.AddModelError("Email", "Email đã được sử dụng.");
+            }
+
+            // Kiểm tra tên người dùng đã tồn tại
+            var existingUserName = await _userManager.FindByNameAsync(model.UserName);
+            if (existingUserName != null)
+            {
+                ModelState.AddModelError("UserName", "Tên người dùng đã tồn tại.");
+            }
+
+            // Kiểm tra số điện thoại đã tồn tại
+            var existingPhoneUser = await _userManager.Users
+                .FirstOrDefaultAsync(u => u.PhoneNumber == model.Phone);
+
+            if (existingPhoneUser != null)
+            {
+                ModelState.AddModelError("Phone", "Số điện thoại đã được sử dụng.");
+            }
+
+            // Nếu có lỗi thì trả về view với thông báo lỗi
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -93,13 +135,14 @@ namespace LHBooksWeb.Controllers
                 PhoneNumber = model.Phone,
                 FullName = model.FullName,
                 EmailConfirmed = true,
-                Address = "Chưa có địa chỉ"
+                Address = "Chưa có địa chỉ",
+                isActive = true
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
-                // Tự động gán quyền "Customer"
+                // Gán quyền "Customer" nếu chưa có
                 if (!await _roleManager.RoleExistsAsync("Customer"))
                 {
                     await _roleManager.CreateAsync(new IdentityRole("Customer"));
@@ -107,9 +150,11 @@ namespace LHBooksWeb.Controllers
 
                 await _userManager.AddToRoleAsync(user, "Customer");
                 await _signInManager.SignInAsync(user, isPersistent: false);
+                TempData["Success"] = "Tạo tài khoản thành công!";
                 return RedirectToAction("Index", "Home");
             }
 
+            // Thêm lỗi từ Identity nếu có
             foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
@@ -117,6 +162,8 @@ namespace LHBooksWeb.Controllers
 
             return View(model);
         }
+
+
 
 
         //lay tinh thanh
@@ -212,6 +259,7 @@ namespace LHBooksWeb.Controllers
             string district = addressParts.Length > 2 ? addressParts[2].Trim() : string.Empty;
             string province = addressParts.Length > 3 ? addressParts[3].Trim() : string.Empty;
 
+
             var model = new EditProfileViewModel
             {
                 FullName = user.FullName,
@@ -234,6 +282,15 @@ namespace LHBooksWeb.Controllers
         {
             if (!ModelState.IsValid)
             {
+                return View(model);
+            }
+
+            if (string.IsNullOrWhiteSpace(model.SpecificAddress) ||
+        string.IsNullOrWhiteSpace(model.Ward) ||
+        string.IsNullOrWhiteSpace(model.District) ||
+        string.IsNullOrWhiteSpace(model.Province))
+            {
+                ModelState.AddModelError(string.Empty, "Vui lòng nhập đầy đủ thông tin địa chỉ (Số nhà, Phường/Xã, Quận/Huyện, Tỉnh/Thành).");
                 return View(model);
             }
 
@@ -262,7 +319,7 @@ namespace LHBooksWeb.Controllers
             var previousUrl = HttpContext.Session.GetString("PreviousUrl");
             if (result.Succeeded)
             {
-                TempData["SuccessMessage"] = "Cập nhật thông tin thành công!";
+                TempData["Success"] = "Cập nhật thônh tin thành công!";
                 if (!string.IsNullOrEmpty(previousUrl))
                 {
                     return Redirect(previousUrl);
@@ -397,6 +454,42 @@ namespace LHBooksWeb.Controllers
             return View();
         }
 
+
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login");
+
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+            if (result.Succeeded)
+            {
+                await _signInManager.RefreshSignInAsync(user);
+                TempData["Success"] = "Đổi mật khẩu thành công!";
+                return RedirectToAction("EditProfile");
+            }
+            else
+            {
+                TempData["Error"] = "Đổi mật khẩu thất bại. Vui lòng kiểm tra lại thông tin.";
+            }
+
+
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return View(model);
+        }
 
     }
 
