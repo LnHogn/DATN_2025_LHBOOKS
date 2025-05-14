@@ -52,8 +52,8 @@ namespace LHBooksWeb.Controllers
             var cartItems = await _cartService.GetSelectedCartItemsAsync();
             if (cartItems == null || !cartItems.Any())
             {
-                ModelState.AddModelError("", "Giỏ hàng của bạn đang trống.");
-                return RedirectToAction("Checkout");
+                TempData["Error"] = "Hãy chọn sản phẩm cần mua";
+                return RedirectToAction("Index","Cart");
             }
 
             var totalAmount = cartItems.Sum(item => item.Price * item.Quantity);
