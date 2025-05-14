@@ -1,4 +1,5 @@
-﻿@* @model ApplicationUser
+﻿
+@model ApplicationUser
 @using Microsoft.Extensions.DependencyInjection
 @{
     ViewData["Title"] = "Thanh toán";
@@ -6,123 +7,11 @@
 
 @{
     var cartService = Context.RequestServices.GetService<CartService>();
-    var cartItems = await cartService.GetCartItemsAsync();
-    var cartTotal = await cartService.GetCartTotalAsync();
-}
-
-<div class="container py-5">
-    <main aria-labelledby="title" style="margin-top: 120px;">
-        <nav aria-label="breadcrumb" class="mb-4">
-            <ol class="breadcrumb bg-light p-3 rounded">
-                <li class="breadcrumb-item">
-                    <a href="/">Trang chủ</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="/Cart">Giỏ hàng</a>
-                </li>
-                <li class="breadcrumb-item " aria-current="page">Thanh toán đơn hàng</li>
-            </ol>
-        </nav>
-        <h2>Thanh toán đơn hàng</h2>
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Thông tin người nhận</h5>
-                    </div>
-                    <div class="card-body">
-                        <form asp-action="PlaceOrder" method="post">
-                            <div class="form-group mb-3">
-                                <label>Họ tên:</label>
-                                <input type="text" class="form-control" value="@Model.FullName" readonly />
-                            </div>
-                            <div class="form-group mb-3">
-                                <label>Email:</label>
-                                <input type="email" class="form-control" value="@Model.Email" readonly />
-                            </div>
-                            <div class="form-group mb-3">
-                                <label>Số điện thoại:</label>
-                                <input type="email" class="form-control" value="@Model.PhoneNumber" readonly />
-                            </div>
-                            <div class="form-group mb-3">
-                                <label>Địa chỉ:</label>
-                                <textarea class="form-control" rows="3" readonly>@Model.Address</textarea>
-                            </div>
-
-                            <a href="/Account/EditProfile?returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="btn btn-success btn-sm">Chỉnh sửa thông tin</a>
-
-                            <div class="form-group mb-3">
-                                <label>Phương thức thanh toán:</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="paymentMethod" id="codMethod" value="1" checked>
-                                    <label class="form-check-label" for="codMethod">
-                                        Thanh toán khi nhận hàng (COD)
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="paymentMethod" id="onlineMethod" value="2">
-                                    <label class="form-check-label" for="onlineMethod">
-                                        Thanh toán trực tuyến (VnPay)
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div class="d-flex justify-content-between mt-4">
-                                <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-secondary">Quay lại giỏ hàng</a>
-                                <button type="submit" class="btn btn-primary">Đặt hàng</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>Thông tin đơn hàng</h5>
-                    </div>
-                    <div class="card-body">
-
-
-                        @foreach (var item in cartItems)
-                        {
-                            <div class="d-flex mb-2 align-items-center">
-                                <img src="@item.ProductImage" alt="@item.ProductName" style="max-width: 50px; max-height: 50px; margin-right: 10px;">
-                                <div>
-                                    <span>@item.ProductName</span>
-                                    <div>
-                                        <small class="text-muted"> @item.Price.ToString("N0") đ x @item.Quantity</small>
-                                        <span class="fw-bold ms-2"> @((item.Price * item.Quantity).ToString("N0")) đ</span>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-
-                        <hr>
-                        <div class="d-flex justify-content-between mt-3">
-                            <span class="fw-bold">Tổng tiền:</span>
-                            <span class="fw-bold text-danger">@cartTotal.ToString("N0") đ</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-</div> *@
-
-                                @model ApplicationUser
-@using Microsoft.Extensions.DependencyInjection
-@{
-    ViewData["Title"] = "Thanh toán";
-}
-
-@{
-    var cartService = Context.RequestServices.GetService<CartService>();
-    var cartItems = await cartService.GetCartItemsAsync();
+    var cartItems = await cartService.GetSelectedCartItemsAsync();
     var cartTotal = await cartService.GetCartTotalAsync();
     var shippingFee = ViewBag.ShippingFee;
     var totalAmountWithShipping = ViewBag.TotalAmountWithShipping;
+
 }
 
 <div class="container py-5">
@@ -141,7 +30,7 @@
         <h2>Thanh toán đơn hàng</h2>
 
         <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-5">
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5>Thông tin người nhận</h5>
@@ -192,7 +81,7 @@
                 </div>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-7">
                 <div class="card">
                     <div class="card-header">
                         <h5>Thông tin đơn hàng</h5>
@@ -214,7 +103,7 @@
                                 {
                                     <tr class="text-center">
                                         <td>
-                                            <img src="@item.ProductImage" alt="@item.ProductName" style="max-width: 70px; max-height: 70px;">
+                                            <img src="@item.ProductImage" alt="@item.ProductName" style="max-width: 60px; max-height: 60px;">
                                         </td>
                                         <td>@item.ProductName</td>
                                         <td>@item.Price.ToString("N0") đ</td>

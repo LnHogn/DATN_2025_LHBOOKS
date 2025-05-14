@@ -32,16 +32,8 @@ namespace LHBooksWeb.Controllers
             _cartService = cartService;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> Checkout()
-        //{
-        //    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        //    var user = await _userManager.FindByIdAsync(userId);
 
-        //    return View(user);
-        //}
-
-        public async Task<IActionResult> Checkout(int paymentMethod)
+        public async Task<IActionResult> Checkout()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -57,7 +49,7 @@ namespace LHBooksWeb.Controllers
             var address = user.Address;
 
             // Lấy giỏ hàng
-            var cartItems = await _cartService.GetCartItemsAsync();
+            var cartItems = await _cartService.GetSelectedCartItemsAsync();
             if (cartItems == null || !cartItems.Any())
             {
                 ModelState.AddModelError("", "Giỏ hàng của bạn đang trống.");
@@ -78,57 +70,6 @@ namespace LHBooksWeb.Controllers
         }
 
 
-        //[HttpPost]
-        //public async Task<IActionResult> PlaceOrder(int paymentMethod)
-        //{
-        //    try
-        //    {
-        //        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        //        // Lấy giỏ hàng
-        //        var cartItems = await _cartService.GetCartItemsAsync();
-        //        if (cartItems == null || !cartItems.Any())
-        //        {
-        //            ModelState.AddModelError("", "Giỏ hàng của bạn đang trống.");
-        //            return RedirectToAction("Checkout");
-        //        }
-
-        //        var totalAmount = cartItems.Sum(item => item.Price * item.Quantity);
-
-        //        if (paymentMethod == 1) // COD
-        //        {
-        //            var order = await _orderService.CreateOrderAsync(paymentMethod, userId, OrderStatus.Pending);
-        //            await _cartService.ClearCartAsync();
-        //            return RedirectToAction("OrderConfirmation");
-        //        }
-        //        else if (paymentMethod == 2) // VNPay
-        //        {
-        //            // Bước 1: Tạo đơn hàng trước với trạng thái Chờ thanh toán
-        //            var order = await _orderService.CreateOrderAsync(paymentMethod, userId, OrderStatus.AwaitingPayment);
-
-        //            // Bước 2: Gửi thông tin sang VNPay
-        //            var paymentModel = new PaymentInformationModel
-        //            {
-        //                OrderId = order.Id,
-        //                Amount = (decimal)totalAmount,
-        //                OrderDescription = $"Thanh toán đơn hàng #{order.Id} lúc {DateTime.Now:yyyyMMddHHmmss}",
-        //                Name = User.Identity?.Name
-        //            };
-
-        //            var paymentUrl = _vnPayService.CreatePaymentUrl(paymentModel, HttpContext);
-        //            return Redirect(paymentUrl);
-        //        }
-
-        //        ModelState.AddModelError("", "Phương thức thanh toán không hợp lệ.");
-        //        return RedirectToAction("Checkout");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ModelState.AddModelError("", ex.Message);
-        //        return RedirectToAction("Checkout");
-        //    }
-        //}
-
         [HttpPost]
         public async Task<IActionResult> PlaceOrder(int paymentMethod)
         {
@@ -138,7 +79,7 @@ namespace LHBooksWeb.Controllers
                 var user = await _userManager.FindByIdAsync(userId);
 
                 // Lấy giỏ hàng
-                var cartItems = await _cartService.GetCartItemsAsync();
+                var cartItems = await _cartService.GetSelectedCartItemsAsync();
                 if (cartItems == null || !cartItems.Any())
                 {
                     ModelState.AddModelError("", "Giỏ hàng của bạn đang trống.");
@@ -158,7 +99,7 @@ namespace LHBooksWeb.Controllers
                     var order = await _orderService.CreateOrderAsync(paymentMethod, userId, OrderStatus.Pending, shippingFee);
 
                     // Xóa giỏ hàng sau khi tạo đơn
-                    await _cartService.ClearCartAsync();
+                    await _cartService.RemoveSelectedItemsAsync();
 
                     return RedirectToAction("OrderConfirmation");
                 }
@@ -237,7 +178,7 @@ namespace LHBooksWeb.Controllers
             order.Status = OrderStatus.Paid;
             order.ModifiedDate = DateTime.Now;
             await _context.SaveChangesAsync(); // lưu thay đổi vào DB
-            await _cartService.ClearCartAsync();
+            await _cartService.RemoveSelectedItemsAsync();
             TempData["Message"] = "Thanh toán VnPay thành công, đơn hàng đã được xác nhận.";
             return RedirectToAction("OrderConfirmation");
         }

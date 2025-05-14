@@ -93,11 +93,11 @@ namespace LHBooksWeb.Controllers
                 order.Status = OrderStatus.Cancelled;
                 _context.SaveChanges();
 
-                TempData["SuccessMessage"] = "Đơn hàng đã được hủy và số lượng đã được cập nhật.";
+                TempData["Success"] = "Đơn hàng đã được hủy.";
             }
             else
             {
-                TempData["ErrorMessage"] = "Không thể hủy đơn hàng khi trạng thái không phải 'Chờ xác nhận'.";
+                TempData["Error"] = "Không thể hủy đơn hàng khi trạng thái không phải 'Chờ xác nhận'.";
             }
 
             return RedirectToAction("Details", new { id = orderId });

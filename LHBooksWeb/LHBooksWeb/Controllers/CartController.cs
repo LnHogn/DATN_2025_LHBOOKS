@@ -3,6 +3,7 @@ using LHBooksWeb.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace LHBooksWeb.Controllers
@@ -12,11 +13,12 @@ namespace LHBooksWeb.Controllers
     {
         private readonly CartService _cartService;
         private readonly UserManager<ApplicationUser> _userManager;
-
-        public CartController(CartService cartService, UserManager<ApplicationUser> userManager)
+        private readonly ApplicationDbContext _context;
+        public CartController(CartService cartService, UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _cartService = cartService;
             _userManager = userManager;
+            _context = context;
         }
 
         [Authorize]
@@ -65,6 +67,33 @@ namespace LHBooksWeb.Controllers
             var cartItems = await _cartService.GetCartItemsAsync();
             int totalQuantity = cartItems.Sum(item => item.Quantity);
             return Json(totalQuantity);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateSelection(int cartItemId, bool isSelected)
+        {
+            var cartItem = await _context.CartItems.FindAsync(cartItemId);
+            if (cartItem != null)
+            {
+                cartItem.IsSelected = isSelected;
+                await _context.SaveChangesAsync();
+                return Ok(); // Trả về mã thành công
+            }
+
+            return BadRequest("Không tìm thấy sản phẩm trong giỏ hàng.");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> GetSelectedTotal()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var selectedItems = await _context.CartItems
+                .Where(c => c.UserId == userId && c.IsSelected)
+                .ToListAsync();
+
+            var selectedTotal = selectedItems.Sum(i => i.Price * i.Quantity);
+
+            return Json(new { total = selectedTotal.ToString("N0") + " đ" });
         }
 
     }

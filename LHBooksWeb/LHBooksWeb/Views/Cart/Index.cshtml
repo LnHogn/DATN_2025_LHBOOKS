@@ -9,79 +9,128 @@
 <div class="container py-5">
     <main aria-labelledby="title" style="margin-top: 120px;">
 
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb bg-light p-3 rounded">
-            <li class="breadcrumb-item">
-                <a href="/">Trang chủ</a>
-            </li>
-            <li class="breadcrumb-item " aria-current="page">Giỏ hàng</li>
-        </ol>
-    </nav>
-    <h2>Giỏ hàng của bạn</h2>
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb bg-light p-3 rounded">
+                <li class="breadcrumb-item">
+                    <a href="/">Trang chủ</a>
+                </li>
+                <li class="breadcrumb-item " aria-current="page">Giỏ hàng</li>
+            </ol>
+        </nav>
+        <h2>Giỏ hàng của bạn</h2>
 
-    @if (Model.Count == 0)
-    {
-        <div class="alert alert-info">
-            Giỏ hàng của bạn đang trống. <a asp-controller="Home" asp-action="Index">Tiếp tục mua sắm</a>
-        </div>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Tên</th>
-                        <th>Giá</th>
-                        <th>Số lượng</th>
-                        <th>Thành tiền</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
+        @if (Model.Count == 0)
+        {
+            <div class="alert alert-info">
+                Giỏ hàng của bạn đang trống. <a asp-controller="Home" asp-action="Index">Tiếp tục mua sắm</a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <td>
-                                <img src="@item.ProductImage" alt="@item.ProductName" style="max-width: 80px; max-height: 80px;" />
-                            </td>
-                            <td>@item.ProductName</td>
-                            <td>@item.Price.ToString("N0") đ</td>
-                            <td>
-                                <div class="input-group" style="max-width: 150px;">
-                                    <form asp-action="UpdateQuantity" method="post" class="d-flex">
-                                        <input type="hidden" name="cartItemId" value="@item.Id" />
-                                        <button type="submit" name="quantity" value="@(item.Quantity - 1)" class="btn btn-outline-secondary btn-sm">-</button>
-                                        <input type="text" class="form-control text-center" value="@item.Quantity" readonly>
-                                        <button type="submit" name="quantity" value="@(item.Quantity + 1)" class="btn btn-outline-secondary btn-sm">+</button>
-                                    </form>
-                                </div>
-                            </td>
-                            <td>@((item.Price * item.Quantity).ToString("N0")) đ</td>
-                            <td>
-                                <form asp-action="RemoveFromCart" method="post">
-                                    <input type="hidden" name="cartItemId" value="@item.Id" />
-                                    <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
-                                </form>
-                            </td>
+                            <th>
+                                <input type="checkbox" id="select-all" /> Chọn tất cả
+                            </th>
+                            <th></th>
+                            <th>Tên</th>
+                            <th>Giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                            <th></th>
                         </tr>
-                    }
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <th colspan="4" class="text-right">Tổng tiền:</th>
-                        <th>@cartTotal.ToString("N0") đ</th>
-                        <th></th>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <input type="checkbox" class="item-select" data-cart-id="@item.Id" @(item.IsSelected ? "checked" : "") />
 
-        <div class="d-flex justify-content-between mt-4">
-            <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">Tiếp tục mua sắm</a>
-            <a asp-controller="Order" asp-action="Checkout" class="btn btn-success">Thanh toán</a>
-        </div>
-    }
+                                </td>
+                                <td>
+                                    <img src="@item.ProductImage" alt="@item.ProductName" style="max-width: 80px; max-height: 80px;" />
+                                </td>
+                                <td>@item.ProductName</td>
+                                <td>@item.Price.ToString("N0") đ</td>
+                                <td>
+                                    <div class="input-group" style="max-width: 150px;">
+                                        <form asp-action="UpdateQuantity" method="post" class="d-flex">
+                                            <input type="hidden" name="cartItemId" value="@item.Id" />
+                                            <button type="submit" name="quantity" value="@(item.Quantity - 1)" class="btn btn-outline-secondary btn-sm">-</button>
+                                            <input type="text" class="form-control text-center" value="@item.Quantity" readonly>
+                                            <button type="submit" name="quantity" value="@(item.Quantity + 1)" class="btn btn-outline-secondary btn-sm">+</button>
+                                        </form>
+                                    </div>
+                                </td>
+                                <td>@((item.Price * item.Quantity).ToString("N0")) đ</td>
+                                <td>
+                                    <form asp-action="RemoveFromCart" method="post">
+                                        <input type="hidden" name="cartItemId" value="@item.Id" />
+                                        <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="4" class="text-right">Tổng tiền:</th>
+                            <th><span id="selected-total">@Model.Where(i => i.IsSelected).Sum(i => i.Price * i.Quantity).ToString("N0") đ</span></th>
+                            <th></th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-primary">Tiếp tục mua sắm</a>
+                <a asp-controller="Order" asp-action="Checkout" class="btn btn-success">Thanh toán</a>
+            </div>
+        }
     </main>
 </div>
+
+<script>
+    $(document).ready(function () {
+
+        $("#select-all").change(function () {
+            var isChecked = $(this).prop("checked");
+
+            $(".item-select").each(function () {
+                $(this).prop("checked", isChecked).trigger("change");
+            });
+        });
+
+        $(".item-select").change(function () {
+            var cartItemId = $(this).data("cart-id");
+            var isSelected = $(this).prop("checked");
+
+            // Gửi yêu cầu Ajax để cập nhật trạng thái chọn
+            $.ajax({
+                url: '@Url.Action("UpdateSelection", "Cart")', // Cập nhật đường dẫn action
+                type: 'POST',
+                data: {
+                    cartItemId: cartItemId,
+                    isSelected: isSelected
+                },
+                success: function (response) {
+                    // Sau khi cập nhật selection thành công, gọi tiếp để tính lại tổng
+                    $.ajax({
+                        url: '@Url.Action("GetSelectedTotal", "Cart")',
+                        type: 'POST',
+                        success: function (data) {
+                            $("#selected-total").text(data.total); // Cập nhật nội dung tổng đã chọn
+                        }
+                    });
+                }
+                ,
+                error: function (xhr, status, error) {
+                    alert('Đã có lỗi xảy ra.');
+                }
+            });
+        });
+    });
+</script>
