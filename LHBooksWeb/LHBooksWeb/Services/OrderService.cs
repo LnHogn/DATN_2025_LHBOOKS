@@ -118,7 +118,7 @@ namespace LHBooksWeb.Services
                 throw new Exception("Không tìm thấy thông tin người dùng");
             }
 
-            var cartItems = await _cartService.GetCartItemsAsync();
+            var cartItems = await _cartService.GetSelectedCartItemsAsync();
             if (cartItems.Count == 0)
             {
                 throw new Exception("Giỏ hàng trống");

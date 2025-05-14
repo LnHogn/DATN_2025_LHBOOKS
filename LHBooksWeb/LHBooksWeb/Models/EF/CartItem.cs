@@ -31,5 +31,8 @@ namespace LHBooksWeb.Models.EF
         public decimal SubTotal => Quantity * Price;
 
         public virtual Product Product { get; set; }
+
+        public bool IsSelected { get; set; } = false;
+
     }
 }

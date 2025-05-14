@@ -59,6 +59,21 @@ namespace LHBooksWeb.Services
             return await _context.CartItems.Where(c => c.UserId == userId).ToListAsync();
         }
 
+        public async Task<List<CartItem>> GetSelectedCartItemsAsync()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return new List<CartItem>();
+            }
+
+            return await _context.CartItems
+                .Where(c => c.UserId == userId && c.IsSelected == true)
+                .ToListAsync();
+        }
+
+
+
         // Cập nhật số lượng sản phẩm
         public async Task UpdateQuantityAsync(int cartItemId, int quantity)
         {
@@ -87,6 +102,24 @@ namespace LHBooksWeb.Services
             }
         }
 
+        public async Task RemoveSelectedItemsAsync()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+                return;
+
+            var selectedItems = await _context.CartItems
+                .Where(c => c.UserId == userId && c.IsSelected)
+                .ToListAsync();
+
+            if (selectedItems.Any())
+            {
+                _context.CartItems.RemoveRange(selectedItems);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+
         // Tính tổng tiền giỏ hàng
         public async Task<decimal> GetCartTotalAsync()
         {
@@ -97,7 +130,7 @@ namespace LHBooksWeb.Services
             }
 
             return await _context.CartItems
-                .Where(c => c.UserId == userId)
+                .Where(c => c.UserId == userId && c.IsSelected)
                 .SumAsync(c => c.Quantity * c.Price); // Hoặc c.SubTotal
         }
 
