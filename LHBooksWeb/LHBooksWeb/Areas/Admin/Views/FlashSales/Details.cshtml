@@ -32,7 +32,7 @@
                             <input type="hidden" name="flashSaleId" value="@Model.Id" />
                             <div class="form-group">
                                 <label>Tên sản phẩm</label>
-                                <input type="text" id="productInput" class="form-control" placeholder="Nhập tên sản phẩm" />
+                                <input type="text" id="productInput" class="form-control" placeholder="Nhập tên sản phẩm" required />
                                 <input type="hidden" name="productId" id="productId" />
                             </div>
 
@@ -56,7 +56,7 @@
 
                             <div class="form-group">
                                 <label>Giới hạn số lượng</label>
-                                <input name="quantityLimit" type="number" class="form-control" />
+                                <input name="quantityLimit" type="number" class="form-control" required />
                             </div>
 
                             <button type="submit" class="btn btn-success">Thêm</button>
@@ -74,11 +74,11 @@
                             <input type="hidden" name="flashSaleId" value="@Model.Id" />
                             <div class="form-group">
                                 <label>% giảm giá</label>
-                                <input name="discountPercent" type="number" class="form-control" min="1" max="100" />
+                                <input name="discountPercent" type="number" class="form-control" min="1" max="100" required />
                             </div>
                             <div class="form-group">
                                 <label>Giới hạn số lượng</label>
-                                <input name="quantityLimit" type="number" class="form-control" />
+                                <input name="quantityLimit" type="number" class="form-control" required />
                             </div>
                             <button type="submit" class="btn btn-primary">Thêm tất cả sản phẩm</button>
                         </form>
@@ -102,11 +102,11 @@
                             </div>
                             <div class="form-group">
                                 <label>% giảm giá</label>
-                                <input name="discountPercent" type="number" class="form-control" min="1" max="100" />
+                                <input name="discountPercent" type="number" class="form-control" min="1" max="100" required />
                             </div>
                             <div class="form-group">
                                 <label>Giới hạn số lượng</label>
-                                <input name="quantityLimit" type="number" class="form-control" />
+                                <input name="quantityLimit" type="number" class="form-control" required />
                             </div>
                             <button type="submit" class="btn btn-warning">Thêm sản phẩm theo danh mục</button>
                         </form>
@@ -130,11 +130,11 @@
                             </div>
                             <div class="form-group">
                                 <label>% giảm giá</label>
-                                <input name="discountPercent" type="number" class="form-control" min="1" max="100" />
+                                <input name="discountPercent" type="number" class="form-control" min="1" max="100" required />
                             </div>
                             <div class="form-group">
                                 <label>Giới hạn số lượng</label>
-                                <input name="quantityLimit" type="number" class="form-control" />
+                                <input name="quantityLimit" type="number" class="form-control" required />
                             </div>
                             <button type="submit" class="btn btn-dark">Thêm sản phẩm theo danh mục phụ</button>
                         </form>

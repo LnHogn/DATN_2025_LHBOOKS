@@ -149,7 +149,7 @@ namespace LHBooksWeb.Services
             //Truy vấn các FlashSale đang diễn ra
                var activeFlashSales = await _context.FlashSales
                    .Include(fs => fs.FlashSaleProducts)
-                   .Where(fs => fs.StartTime <= DateTime.Now && fs.EndTime >= DateTime.Now)
+                   .Where(fs => fs.StartTime <= DateTime.Now && fs.EndTime >= DateTime.Now && fs.IsActive == true)
                    .ToListAsync();
 
             // Chuyển các item từ giỏ hàng sang chi tiết đơn hàng

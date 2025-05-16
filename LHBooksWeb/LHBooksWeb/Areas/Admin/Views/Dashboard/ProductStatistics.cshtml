@@ -81,6 +81,7 @@
                             <th>Tên sản phẩm</th>
                             <th>Đã bán</th>
                             <th>Tồn kho</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -95,6 +96,9 @@
                                 <td>@product.Name</td>
                                 <td>@product.QuantitySold</td>
                                 <td>@product.StockQuantity</td>
+                                <td>
+                                    <a asp-area="Admin" asp-controller="Products" asp-action="edit" asp-route-id="@product.id" class="btn btn-sm btn-primary">Thêm hàng</a>
+                                </td>
                             </tr>
                         }
                     </tbody>

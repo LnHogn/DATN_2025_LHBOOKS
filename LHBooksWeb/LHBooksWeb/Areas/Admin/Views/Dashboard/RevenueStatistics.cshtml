@@ -40,6 +40,23 @@
         </div>
     </div>
 
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
+            <i class="fas fa-money-bill mr-1"></i>
+            <h6 class="m-0 font-weight-bold text-primary">Doanh thu hôm nay</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-success">
+                        <h4>Tổng doanh thu: @Model.TodayRevenue.ToString("N0") VNĐ</h4>
+                        <p>Thời gian: @Model.EndDate.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Tổng quan doanh thu -->
     <div class="card shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-lg-start">
@@ -110,7 +127,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table" id="myTable" width="100%" cellspacing="0">
+                <table class="table" id="myTableDt" width="100%" cellspacing="0">
                     <thead>
                         <tr>
                             <th>Ngày</th>

@@ -167,7 +167,7 @@ namespace LHBooksWeb.Controllers
 
             // Tìm flash sale đang diễn ra cho sản phẩm hiện tại
             var flashSale = product.FlashSaleProducts
-                .FirstOrDefault(fsp => fsp.FlashSale != null && fsp.FlashSale.EndTime > DateTime.Now);
+                .FirstOrDefault(fsp => fsp.FlashSale != null && fsp.FlashSale.EndTime > DateTime.Now && fsp.FlashSale.IsActive == true);
 
             bool isInFlashSale = flashSale != null;
             bool isFlashSaleSoldOut = isInFlashSale && flashSale.Sold >= flashSale.QuantityLimit;
@@ -206,28 +206,48 @@ namespace LHBooksWeb.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddReview(ProductReviewViewModel model)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                TempData["Error"] = "Bạn cần đăng nhập để đánh giá sản phẩm.";
+                return RedirectToAction("Detail", new { alias = model.Alias, id = model.ProductId });
+            }
+
+            var userId = _userManager.GetUserId(User);
+
+            // Kiểm tra xem người dùng đã đánh giá sản phẩm này chưa
+            var existingReview = await _context.productReviews
+                .FirstOrDefaultAsync(r => r.ProductId == model.ProductId && r.UserId == userId);
+
+            if (existingReview != null)
+            {
+                TempData["Error"] = "Bạn đã đánh giá sản phẩm này rồi.";
+                return RedirectToAction("Detail", new { alias = model.Alias, id = model.ProductId });
+            }
+
             if (ModelState.IsValid)
             {
-                var userId = _userManager.GetUserId(User);
                 var review = new ProductReview
                 {
-                    ProductId = model.ProductId,                 
+                    ProductId = model.ProductId,
                     UserId = userId,
                     Rating = model.Rating,
                     Comment = model.Comment,
-                    IsApproved = true, // luôn được duyệt
+                    IsApproved = true,
                     CreatedDate = DateTime.Now
                 };
 
                 _context.productReviews.Add(review);
                 await _context.SaveChangesAsync();
 
+                TempData["Success"] = "Đánh giá của bạn đã được ghi nhận.";
                 return RedirectToAction("Detail", new { alias = model.Alias, id = model.ProductId });
             }
 
-            // Nếu có lỗi, vẫn trả về Details
+            TempData["Error"] = "Đánh giá không hợp lệ.";
             return RedirectToAction("Detail", new { alias = model.Alias, id = model.ProductId });
         }
+
+
 
 
         public async Task<IActionResult> RelatedProducts(int subCategoryId, string authorName, int currentProductId)
