@@ -118,7 +118,7 @@
     {
         foreach (var item in activeProducts)
         {
-            var flashSale = item.FlashSaleProducts.FirstOrDefault(fsp => fsp.FlashSale != null && fsp.FlashSale.EndTime > DateTime.Now);
+            var flashSale = item.FlashSaleProducts.FirstOrDefault(fsp => fsp.FlashSale != null && fsp.FlashSale.EndTime > DateTime.Now && fsp.FlashSale.IsActive == true);
             bool isInFlashSale = flashSale != null;
             bool isFlashSaleSoldOut = isInFlashSale && flashSale.Sold >= flashSale.QuantityLimit;
 

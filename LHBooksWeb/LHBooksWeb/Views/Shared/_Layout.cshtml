@@ -35,11 +35,16 @@
             @inject UserManager<ApplicationUser> UserManager
             @using LHBooksWeb.Data
             @using Microsoft.AspNetCore.Identity
+            @using LHBooksWeb.Models.EF
             <div class="top_nav">
                 <div class="container">
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="top_nav_left">Hotline: 0123456789</div>
+                            @inject ApplicationDbContext _context
+                            @{
+                                var phone = _context.Contact.FirstOrDefault()?.Phone;
+                            }
+                            <div class="top_nav_left">HOTLINE: @phone</div>
                         </div>
                         <div class="col-md-6 text-right">
                             <div class="top_nav_right">

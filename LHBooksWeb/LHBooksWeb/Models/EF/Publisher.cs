@@ -10,7 +10,7 @@ namespace LHBooksWeb.Models.EF
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage ="Tên nxb không được để trống.")]
         [StringLength(250)]
         public string Name { get; set; }
 

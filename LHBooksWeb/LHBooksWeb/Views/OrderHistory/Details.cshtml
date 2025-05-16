@@ -78,6 +78,11 @@
                                 <strong>Trạng thái:</strong><br />
                                 <span class="@statusClass fs-4 fw-bold">@Model.Status.GetDisplayName()</span>
                             </p>
+                            @if(Model.Status.GetDisplayName() == "Đã giao hàng")
+                            {
+                                <p><strong>Đã giao ngày:</strong> @Model.ModifiedDate?.ToString("dd/MM/yyyy HH:mm")</p>
+
+                            }
                         </div>
                     </div>
                 </div>

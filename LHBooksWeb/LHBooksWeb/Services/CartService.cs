@@ -56,7 +56,10 @@ namespace LHBooksWeb.Services
             {
                 return new List<CartItem>();
             }
-            return await _context.CartItems.Where(c => c.UserId == userId).ToListAsync();
+            return await _context.CartItems
+                .Include(c => c.Product)
+                .Where(c => c.UserId == userId)
+                .ToListAsync();
         }
 
         public async Task<List<CartItem>> GetSelectedCartItemsAsync()

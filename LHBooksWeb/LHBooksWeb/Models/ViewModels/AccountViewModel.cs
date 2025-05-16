@@ -107,37 +107,46 @@ namespace LHBooksWeb.Models.ViewModels
         public string SpecificAddress { get; set; } // Địa chỉ cụ thể
     }
 
+
     public class CreateAccountViewModel
     {
-        [Required]
+        [Required(ErrorMessage = "Vui lòng nhập tên đăng nhập.")]
         [Display(Name = "Tên đăng nhập")]
         public string UserName { get; set; }
 
-        [Required]
-        [Display(Name = "FullName")]
+        [Required(ErrorMessage = "Vui lòng nhập họ tên.")]
+        [Display(Name = "Họ tên")]
         public string FullName { get; set; }
 
-        [Display(Name = "Phone")]
+        [Display(Name = "Số điện thoại")]
+        [Phone(ErrorMessage = "Số điện thoại không hợp lệ.")]
+        [Required(ErrorMessage = "Vui lòng nhập số điện thoại.")]
+
         public string Phone { get; set; }
 
+        [Required(ErrorMessage = "Vui lòng chọn quyền.")]
+        [Display(Name = "Quyền")]
         public string Role { get; set; }
 
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Vui lòng nhập địa chỉ email.")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ.")]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu.")]
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu")]
+        [MinLength(6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự.")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{6,}$", ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự, chứa ít nhất một chữ cái viết thường, một chữ cái viết hoa và một ký tự đặc biệt.")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Nhập lại mật khẩu")]
-        [Compare("Password", ErrorMessage = "Mật khẩu nhập lại không trùng khớp")]
+        [Display(Name = "Xác nhận mật khẩu")]
+        [Compare("Password", ErrorMessage = "Mật khẩu không khớp.")]
+        [Required(ErrorMessage = "Vui lòng nhập xác nhận mật khẩu.")]
         public string ConfirmPassword { get; set; }
-
     }
+
 
     public class EditAccountViewModel
     {

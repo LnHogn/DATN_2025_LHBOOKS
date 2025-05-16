@@ -18,6 +18,7 @@ namespace LHBooksWeb.Models.EF
             [Required]
             public decimal FlashPrice { get; set; }
 
+            [Required]
             public int QuantityLimit { get; set; } = 0; // giới hạn số lượng trong đợt sale
 
             public int Sold { get; set; } = 0; // số lượng đã bán

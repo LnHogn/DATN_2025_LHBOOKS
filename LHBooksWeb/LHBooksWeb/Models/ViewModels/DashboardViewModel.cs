@@ -42,6 +42,7 @@
 
     public class OutOfStockProductViewModel
     {
+        public int id { get; set; }
         public string Name { get; set; }
         public int StockQuantity { get; set; }
         public int QuantitySold { get; set; }
@@ -65,6 +66,7 @@
         public List<DailyRevenueViewModel> DailyRevenue { get; set; }
         public Dictionary<string, decimal> RevenueByPaymentMethod { get; set; }
         public Dictionary<string, decimal> RevenueByCategory { get; set; }
+        public decimal TodayRevenue { get; set; }
     }
 
     // Customer statistics view model

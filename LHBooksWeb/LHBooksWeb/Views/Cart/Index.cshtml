@@ -53,7 +53,9 @@
                                 <td>
                                     <img src="@item.ProductImage" alt="@item.ProductName" style="max-width: 80px; max-height: 80px;" />
                                 </td>
-                                <td>@item.ProductName</td>
+                                <td>
+                                    <a href="/Products/Detail/@item.Product.Alias/@item.Product.Id">@item.ProductName</a>
+                                </td>
                                 <td>@item.Price.ToString("N0") đ</td>
                                 <td>
                                     <div class="input-group" style="max-width: 150px;">

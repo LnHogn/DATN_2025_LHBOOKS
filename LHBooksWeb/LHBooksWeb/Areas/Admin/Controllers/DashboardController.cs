@@ -23,11 +23,15 @@ using iText.IO.Font;
 using static iText.Kernel.Font.PdfFontFactory;
 using iText.Kernel.Geom;
 using Path = System.IO.Path;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using Table = iText.Layout.Element.Table;
 
 namespace LHBooksWeb.Areas.Admin.Controllers
 {
 
     [Area("Admin")]
+    [Authorize(Roles = "Admin,Manager,Employee")]
+
     public class DashboardController : BaseController
     {
         private readonly ApplicationDbContext _context;
@@ -38,6 +42,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         }
 
         // Dashboard view showing all key statistics
+
         public async Task<IActionResult> Index()
         {
             var dashboardVM = new DashboardViewModel
@@ -88,7 +93,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         }
 
         // Product Statistics
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin,Manager,Employee")]
 
         public async Task<IActionResult> ProductStatistics()
         {
@@ -96,6 +101,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
     .Where(p => p.IsActive && p.Quantity <= 0)
     .Select(p => new OutOfStockProductViewModel
     {
+        id = p.Id,
         Name = p.Name,
         StockQuantity = p.Quantity,
         QuantitySold = _context.OrderDetails
@@ -144,15 +150,19 @@ namespace LHBooksWeb.Areas.Admin.Controllers
             var start = startDate ?? DateTime.Now.AddMonths(-1);
             var end = endDate?.AddDays(1).AddMilliseconds(-1) ?? DateTime.Now;
 
+
             var revenueStats = new RevenueStatisticsViewModel
             {
                 StartDate = start,
                 EndDate = end,
+                TodayRevenue = await GetRevenueByDate(DateTime.Now),
                 TotalRevenue = await GetRevenueInPeriod(start, end),
                 DailyRevenue = await GetDailyRevenue(start, end),
                 RevenueByPaymentMethod = await GetRevenueByPaymentMethod(start, end),
                 RevenueByCategory = await GetRevenueByCategory(start, end)
             };
+
+            
 
             return View(revenueStats);
         }
@@ -204,39 +214,6 @@ namespace LHBooksWeb.Areas.Admin.Controllers
             };
         }
 
-        //public async Task<IActionResult> ExportSalesData(DateTime? startDate, DateTime? endDate, string format = "excel")
-        //{
-        //    var start = startDate ?? DateTime.Now.AddMonths(-1);
-        //    var end = endDate?.AddDays(1).AddMilliseconds(-1) ?? DateTime.Now;
-
-        //    var orders = await _context.Orders
-        //        .Include(o => o.OrderDetails).ThenInclude(o => o.FlashSale)
-        //        .Where(o => o.OrderDate.Date >= start.Date && o.OrderDate.Date <= end.Date)
-        //        .OrderBy(o => o.OrderDate)
-        //        .ToListAsync();
-
-        //    var revenueStats = new RevenueStatisticsViewModel
-        //    {
-        //        StartDate = start,
-        //        EndDate = end,
-        //        TotalRevenue = await GetRevenueInPeriod(start, end),
-        //        DailyRevenue = await GetDailyRevenue(start, end),
-        //        RevenueByPaymentMethod = await GetRevenueByPaymentMethod(start, end),
-        //        RevenueByCategory = await GetRevenueByCategory(start, end)
-        //    };
-
-        //    // Kiểm tra format và xuất dữ liệu
-        //    if (format.ToLower() == "excel")
-        //    {
-        //        return ExportToExcel(orders, revenueStats, start, end);
-        //    }
-        //    else if (format.ToLower() == "pdf")
-        //    {
-        //        return ExportToPdf(orders, revenueStats, start, end);
-        //    }
-
-        //    return BadRequest("Chỉ hỗ trợ xuất Excel hoặc PDF trong phiên bản này.");
-        //}
         public async Task<IActionResult> ExportSalesData(DateTime? startDate, DateTime? endDate, string format = "excel")
         {
             var start = startDate ?? DateTime.Now.AddMonths(-1);
@@ -383,7 +360,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                     worksheet.Cell(1, 12).Value = "Tổng tiền đơn hàng";
                     worksheet.Cell(1, 13).Value = "Trạng thái đơn hàng";
 
-                    for (int col = 1; col <= 12; col++)
+                    for (int col = 1; col <= 13; col++)
                     {
                         worksheet.Cell(1, col).Style.Font.Bold = true;
                         worksheet.Cell(1, col).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
@@ -425,7 +402,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                             worksheet.Cell(detailRow, 12).Value = order.TotalAmount;
                             worksheet.Cell(detailRow, 13).Value = order.Status.GetDisplayName();
 
-                            for (int col = 1; col <= 12; col++)
+                            for (int col = 1; col <= 13; col++)
                             {
                                 worksheet.Cell(detailRow, col).Style.Fill.BackgroundColor = orderColorMap[order.Code];
                             }
@@ -448,69 +425,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         }
 
 
-        //private IActionResult ExportToPdf(List<LHBooksWeb.Models.EF.Order> orders, RevenueStatisticsViewModel revenueStats, DateTime startDate, DateTime endDate)
-        //{
-        //    using (var ms = new MemoryStream())
-        //    {
-        //        // Tạo đối tượng PdfWriter
-        //        var writer = new PdfWriter(ms);
-        //        var pdf = new PdfDocument(writer);
-        //        var document = new Document(pdf);
-
-        //        // Tiêu đề - Sử dụng Text để cài đặt kiểu chữ
-        //        var boldFont = PdfFontFactory.CreateFont(StandardFonts.HELVETICA_BOLD);
-        //        var title = new Paragraph("Danh sách đơn hàng")
-        //            .SetFont(boldFont)
-        //            .SetFontSize(16)
-        //            .SetTextAlignment(TextAlignment.CENTER);
-
-        //        document.Add(title);
-
-        //        // Thêm thông tin tổng quan doanh thu
-        //        document.Add(new Paragraph($"Từ ngày: {revenueStats.StartDate:dd/MM/yyyy}"));
-        //        document.Add(new Paragraph($"Đến ngày: {revenueStats.EndDate:dd/MM/yyyy}"));
-        //        document.Add(new Paragraph($"Tổng doanh thu: {revenueStats.TotalRevenue:C}"));
-
-        //        // Tạo bảng
-        //        var table = new Table(11);
-        //        table.AddCell("Mã đơn");
-        //        table.AddCell("Khách hàng");
-        //        table.AddCell("SĐT");
-        //        table.AddCell("Địa chỉ");
-        //        table.AddCell("Email");
-        //        table.AddCell("Sản phẩm");
-        //        table.AddCell("Số lượng");
-        //        table.AddCell("Giá");
-        //        table.AddCell("Thành tiền");
-        //        table.AddCell("Tổng tiền đơn hàng");
-        //        table.AddCell("Trạng thái đơn hàng");
-
-        //        // Thêm các đơn hàng vào bảng
-        //        foreach (var order in orders)
-        //        {
-        //            foreach (var detail in order.OrderDetails)
-        //            {
-        //                table.AddCell(order.Code);
-        //                table.AddCell(order.CustomerName);
-        //                table.AddCell(order.Phone);
-        //                table.AddCell(order.Address);
-        //                table.AddCell(order.Email);
-        //                table.AddCell(detail.ProductName ?? detail.Product?.Name);
-        //                table.AddCell(detail.Quantity.ToString());
-        //                table.AddCell(detail.Price.ToString("#,##0₫"));
-        //                table.AddCell(detail.SubTotal.ToString("#,##0₫"));
-        //                table.AddCell(order.TotalAmount.ToString("#,##0₫"));
-        //                table.AddCell(order.Status.GetDisplayName());
-        //            }
-        //        }
-
-        //        document.Add(table);
-
-        //        // Lưu file PDF và trả về
-        //        document.Close();
-        //        return File(ms.ToArray(), "application/pdf", $"SalesData_{startDate:yyyyMMdd}_{endDate:yyyyMMdd}.pdf");
-        //    }
-        //}
+        
         private IActionResult ExportToPdf(List<LHBooksWeb.Models.EF.Order> orders, RevenueStatisticsViewModel revenueStats, DateTime startDate, DateTime endDate)
         {
             using (var ms = new MemoryStream())
@@ -588,6 +503,23 @@ namespace LHBooksWeb.Areas.Admin.Controllers
 
         #region Helper Methods
 
+        private async Task<decimal> GetRevenueByDate(DateTime date)
+        {
+            var startDate = date.Date;
+            var endDate = startDate.AddDays(1).AddMilliseconds(-1);
+
+            return await _context.Orders
+                .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate
+                            && ((o.TypePayment == 2 &&
+                            o.Status != OrderStatus.Cancelled &&
+                            o.Status != OrderStatus.AwaitingPayment &&
+                            o.Status != OrderStatus.PaymentFailed)
+                           ||
+                           (o.TypePayment == 1 &&
+                            o.Status != OrderStatus.Cancelled)))
+                .SumAsync(o => o.TotalAmount);
+        }
+
         private async Task<decimal> GetTotalSales()
         {
             return await _context.Orders
@@ -596,7 +528,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                         o.Status != OrderStatus.AwaitingPayment &&
                         o.Status != OrderStatus.PaymentFailed)
                        ||
-                       (o.TypePayment == 1 && o.Status == OrderStatus.Delivered)))
+                       (o.TypePayment == 1 && o.Status != OrderStatus.Cancelled)))
                 .SumAsync(o => o.TotalAmount); // Tính tổng doanh thu của TotalAmount
         }
 
@@ -770,7 +702,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                         o.Status != OrderStatus.AwaitingPayment &&
                         o.Status != OrderStatus.PaymentFailed)
                        ||
-                       (o.TypePayment == 1 && o.Status == OrderStatus.Delivered)))
+                       (o.TypePayment == 1 && o.Status != OrderStatus.Cancelled)))
                 .GroupBy(o => new { Month = o.OrderDate.Month, Year = o.OrderDate.Year })
                 .Select(g => new
                 {
@@ -848,7 +780,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                                 o.Status != OrderStatus.AwaitingPayment &&
                                 o.Status != OrderStatus.PaymentFailed)
                                ||
-                               (o.TypePayment == 1 && o.Status == OrderStatus.Delivered)
+                               (o.TypePayment == 1 && o.Status != OrderStatus.Cancelled)
                            ))
                 .GroupBy(o => o.OrderDate.Date)
                 .Select(g => new DailyOrdersViewModel
@@ -957,7 +889,8 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                         o.Status != OrderStatus.AwaitingPayment &&
                         o.Status != OrderStatus.PaymentFailed)
                        ||
-                       (o.TypePayment == 1 && o.Status == OrderStatus.Delivered)))
+                       (o.TypePayment == 1 &&
+                            o.Status != OrderStatus.Cancelled)))
                 .SumAsync(o => o.TotalAmount); // Tính tổng của TotalAmount
         }
 
@@ -972,7 +905,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                         o.Status != OrderStatus.AwaitingPayment &&
                         o.Status != OrderStatus.PaymentFailed)
                        ||
-                       (o.TypePayment == 1 && o.Status == OrderStatus.Delivered)))
+                       (o.TypePayment == 1 && o.Status != OrderStatus.Cancelled)))
                 .GroupBy(o => o.OrderDate.Date)
                 .Select(g => new DailyRevenueViewModel
                 {
@@ -993,7 +926,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                         o.Status != OrderStatus.AwaitingPayment &&
                         o.Status != OrderStatus.PaymentFailed)
                        ||
-                       (o.TypePayment == 1 && o.Status == OrderStatus.Delivered)))
+                       (o.TypePayment == 1 && o.Status != OrderStatus.Cancelled)))
                 .GroupBy(o => o.TypePayment)
                 .Select(g => new
                 {
@@ -1052,7 +985,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                         o.Status != OrderStatus.AwaitingPayment &&
                         o.Status != OrderStatus.PaymentFailed
                        ||
-                       o.TypePayment == 1 && o.Status == OrderStatus.Delivered)
+                       o.TypePayment == 1 && o.Status != OrderStatus.Cancelled)
                 .GroupBy(o => new { o.CustomerName, o.Email, o.Phone })
                 .Select(g => new TopCustomerViewModel
                 {

@@ -9,11 +9,15 @@ using System.Linq;
 using LHBooksWeb.Data;
 using LHBooksWeb.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using DocumentFormat.OpenXml.Spreadsheet;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 
 namespace LHBooksWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = "Admin,Manager,Employee")]
+
     public class AccountController : BaseController
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -95,6 +99,37 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                     return View(model);
                 }
 
+                // Kiểm tra Username đã tồn tại
+                var existingUserByUsername = await _userManager.FindByNameAsync(model.UserName);
+                if (existingUserByUsername != null)
+                {
+                    ModelState.AddModelError("UserName", "Tên đăng nhập đã tồn tại.");
+                    TempData["ErrorMessage"] = "Tên đăng nhập đã tồn tại.";
+                    await LoadRolesAsync(model.Role);
+                    return View(model);
+                }
+
+                // Kiểm tra Email đã tồn tại
+                var existingUserByEmail = await _userManager.FindByEmailAsync(model.Email);
+                if (existingUserByEmail != null)
+                {
+                    ModelState.AddModelError("Email", "Email đã được sử dụng.");
+                    TempData["ErrorMessage"] = "Email đã được sử dụng.";
+                    await LoadRolesAsync(model.Role);
+                    return View(model);
+                }
+
+                // Kiểm tra SĐT đã tồn tại
+                var existingUserByPhone = _userManager.Users.FirstOrDefault(u => u.PhoneNumber == model.Phone);
+                if (existingUserByPhone != null)
+                {
+                    ModelState.AddModelError("Phone", "Số điện thoại đã được sử dụng.");
+                    TempData["ErrorMessage"] = "Số điện thoại đã được sử dụng.";
+                    await LoadRolesAsync(model.Role);
+                    return View(model);
+                }
+
+
                 // Tạo đối tượng ApplicationUser từ ViewModel
                 var user = new ApplicationUser
                 {
@@ -102,9 +137,8 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                     Email = model.Email,
                     isActive = true,
                     PhoneNumber = model.Phone,
-                    FullName = model.FullName, // Gán FullName nếu có trong ApplicationUser
-                    EmailConfirmed = true // Hoặc false nếu bạn muốn quy trình xác thực email
-                    // Thêm các thuộc tính khác nếu cần
+                    FullName = model.FullName, 
+                    EmailConfirmed = true 
                 };
 
                 // Thử tạo user mới với mật khẩu đã cung cấp
@@ -112,27 +146,22 @@ namespace LHBooksWeb.Areas.Admin.Controllers
 
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation($"User {user.UserName} created successfully."); // Ghi log thành công
 
                     // Thêm user vào Role đã chọn
                     var addToRoleResult = await _userManager.AddToRoleAsync(user, model.Role);
 
                     if (addToRoleResult.Succeeded)
                     {
-                        _logger.LogInformation($"User {user.UserName} added to role {model.Role}."); // Ghi log gán role thành công
                         // Thành công, chuyển hướng đến trang danh sách tài khoản (hoặc trang khác)
                         TempData["SuccessMessage"] = $"Tạo tài khoản {user.UserName} thành công!";
                         return RedirectToAction("Index", "Account"); // Hoặc tên controller quản lý user của bạn
                     }
                     else
                     {
-                        // Ghi log lỗi khi gán role
-                        _logger.LogError($"Error adding user {user.UserName} to role {model.Role}.");
                         // Xử lý lỗi khi thêm Role (hiếm khi xảy ra nếu role đã được kiểm tra tồn tại)
                         foreach (var error in addToRoleResult.Errors)
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
-                            _logger.LogError($"Error detail: {error.Code} - {error.Description}");
                         }
                         TempData["ErrorMessage"] = $"Đã tạo người dùng nhưng không thể gán quyền {model.Role}.";
                         // Lưu ý: User đã được tạo, nhưng chưa có Role.
@@ -142,13 +171,10 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                 }
                 else
                 {
-                    // Ghi log lỗi khi tạo user
-                    _logger.LogError($"Error creating user {model.UserName}.");
                     // Nếu tạo user thất bại, thêm lỗi vào ModelState để hiển thị trên View
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
-                        _logger.LogError($"Error detail: {error.Code} - {error.Description}");
                     }
                     TempData["ErrorMessage"] = "Không thể tạo tài khoản. Vui lòng kiểm tra thông tin.";
                 }
@@ -158,9 +184,8 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                 TempData["ErrorMessage"] = "Thông tin không hợp lệ. Vui lòng kiểm tra lại.";
             }
 
-            // Nếu có lỗi (ModelState không valid hoặc tạo user/gán role thất bại), load lại roles và hiển thị lại form
-            await LoadRolesAsync(model.Role); // Load lại danh sách Roles cho dropdown
-            return View(model); // Trả về view với dữ liệu đã nhập và thông báo lỗi
+            await LoadRolesAsync(model.Role); 
+            return View(model);
         }
 
         [AllowAnonymous]

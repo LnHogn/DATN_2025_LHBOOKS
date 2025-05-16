@@ -86,7 +86,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Thời gian hết hạn của session
+    options.IdleTimeout = TimeSpan.FromHours(1); // Thời gian hết hạn của session
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -94,11 +94,11 @@ builder.Services.AddSession(options =>
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.IsEssential = true;
-});
+//builder.Services.AddSession(options =>
+//{
+//    options.IdleTimeout = TimeSpan.FromMinutes(30);
+//    options.Cookie.IsEssential = true;
+//});
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CartService>();

@@ -165,7 +165,10 @@
             $('#myTable3').DataTable({
                 ...commonOptions,
             });
-
+            $('#myTableDt').DataTable({
+                ...commonOptions,
+                order: [[2, "desc"]]
+            });
             // Các bảng khác dùng cấu hình chung
             $('#myTable').not('#orderTable').not('#flashtb').not('#flashsaleTb').each(function () {
                 $(this).DataTable(commonOptions);
