@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<Order>
 
-
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 <div class="container py-5">
     <main aria-labelledby="title" style="margin-top: 120px;">
         <div>
@@ -16,9 +18,9 @@
             <h2 class="mb-4">Lịch sử mua hàng</h2>
 
             <div class="card shadow-sm rounded-4">
-                <div class="card-body p-0">
+                <div class="card-body">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
+                        <table class="table table-hover align-middle mb-0" id="myTable">
                             <thead class="table-light">
                                 <tr>
                                     <th scope="col">Mã đơn hàng</th>
@@ -59,6 +61,13 @@
                                             <a class="btn btn-sm btn-outline-primary rounded-pill" asp-action="Details" asp-route-id="@order.Id">
                                                 Xem chi tiết
                                             </a>
+                                            @if (order.Status == OrderStatus.Pending)
+                                            {
+                                                <button class="btn btn-sm btn-outline-danger rounded-pill cancelOrderButton" data-id="@order.Id">
+                                                    Hủy đơn hàng
+                                                </button>
+                                            }
+
                                         </td>
                                     </tr>
                                 }
@@ -71,3 +80,57 @@
         </div>
     </main>
 </div>
+@section Scripts {
+    <script>
+        document.querySelectorAll(".cancelOrderButton").forEach(button => {
+            button.addEventListener("click", function () {
+                const orderId = this.getAttribute("data-id");
+
+                Swal.fire({
+                    title: 'Bạn có chắc chắn muốn hủy đơn hàng?',
+                    text: "Đơn hàng này sẽ không thể phục hồi!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Hủy đơn hàng',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Lấy AntiForgeryToken từ input ẩn
+                        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                        fetch('/OrderHistory/CancelOrder', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `orderId=${orderId}&__RequestVerificationToken=${encodeURIComponent(token)}`
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'Đơn hàng đã được hủy.',
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                    }).then(() => {
+                                        location.reload();
+                                    });
+                                } else {
+                                    throw new Error("Không thể hủy đơn hàng.");
+                                }
+                            })
+                            .catch(() => {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Lỗi',
+                                    text: 'Đã có lỗi xảy ra. Vui lòng thử lại.'
+                                });
+                            });
+                    }
+                });
+            });
+        });
+    </script>
+}

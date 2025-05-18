@@ -38,9 +38,9 @@ namespace LHBooksWeb.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddToCart(int productId, string productName, string productImage, decimal price, int quantity = 1)
+        public async Task<IActionResult> AddToCart(int productId, string productName, string productImage, decimal price, int quantity , bool isSelected)
         {
-            await _cartService.AddToCartAsync(productId, productName, productImage, price, quantity);
+            await _cartService.AddToCartAsync(productId, productName, productImage, price, quantity, isSelected);
             return Json(new { success = true, message = "Đã thêm sản phẩm vào giỏ hàng" });
         }
 

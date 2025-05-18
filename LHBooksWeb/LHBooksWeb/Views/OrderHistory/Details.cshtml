@@ -1,5 +1,7 @@
 ﻿@model Order
-
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 <style>
     .card {
         transition: box-shadow 0.3s ease;
@@ -10,6 +12,7 @@
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
 </style>
+
 
 <div class="container py-5">
     <main aria-labelledby="title" style="margin-top: 120px;">
@@ -143,13 +146,23 @@
                 </div>
             </div>
 
-            <a asp-action="Index" class="btn btn-outline-secondary">
-                Quay lại danh sách
-            </a>
-            @if (Model.Status == OrderStatus.Pending)
-            {
-                <button class="btn btn-danger" id="cancelOrderButton">Hủy đơn hàng</button>
-            }
+            <div class="d-flex">
+                <a asp-action="Index" class="btn btn-sm btn-outline-secondary mr-2">
+                    Quay lại danh sách
+                </a>
+                @if (Model.Status == OrderStatus.Pending)
+                {
+                    <form id="cancelOrderForm" asp-controller="OrderHistory" asp-action="CancelOrder" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="orderId" value="@Model.Id" />
+                        <button type="button" class="btn btn-sm btn-outline-danger rounded-pill" id="cancelOrderButton">
+                            Hủy đơn hàng
+                        </button>
+                    </form>
+                }
+            </div>
+            
+
 
         </div>
     </main>
@@ -169,8 +182,34 @@
                 cancelButtonText: 'Hủy'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Send the request to cancel the order
-                    window.location.href = '@Url.Action("CancelOrder", "OrderHistory", new { orderId = Model.Id })';
+                    const form = document.getElementById("cancelOrderForm");
+                    const formData = new FormData(form);
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Đơn hàng đã được hủy.',
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                }).then(() => {
+                                    location.reload();
+                                });
+                            } else {
+                                throw new Error('Hủy thất bại');
+                            }
+                        })
+                        .catch(error => {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Lỗi',
+                                text: 'Không thể hủy đơn hàng. Vui lòng thử lại.'
+                            });
+                        });
                 }
             });
         });
