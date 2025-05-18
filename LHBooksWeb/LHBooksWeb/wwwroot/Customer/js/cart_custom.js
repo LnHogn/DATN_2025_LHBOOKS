@@ -20,6 +20,7 @@
         const productImage = button.data('image');
         const price = parseFloat(button.data('price'));
         const quantity = parseInt(button.data('quantity'));
+        const isSelected = false;
 
         $.ajax({
             url: '/Cart/AddToCart',
@@ -29,7 +30,8 @@
                 productName,
                 productImage,
                 price,
-                quantity
+                quantity,
+                isSelected
             },
             success: function (res) {
                 if (res.success) {
@@ -73,6 +75,7 @@
         const productImage = button.data('image');
         const price = parseFloat(button.data('price'));
         const quantity = parseInt(button.data('quantity'));
+        const isSelected = true;
 
         $.ajax({
             url: '/Cart/AddToCart',
@@ -82,7 +85,8 @@
                 productName,
                 productImage,
                 price,
-                quantity
+                quantity,
+                isSelected
             },
             success: function (res) {
                 if (res.success) {

@@ -1,4 +1,4 @@
-﻿@model LHBooksWeb.Models.ViewModels.RegisterViewModel
+﻿@* @model LHBooksWeb.Models.ViewModels.RegisterViewModel
 
 @{
     ViewData["Title"] = "Đăng ký tài khoản";
@@ -54,6 +54,97 @@
 
         <div class="text-center mt-3" style="font-size: 1.3rem;">
             <small>Đã có tài khoản? <a asp-action="Login">Đăng nhập</a></small>
+        </div>
+    </div>
+</div>
+ *@
+
+@model LHBooksWeb.Models.ViewModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/customer/styles/loginstyle.css" rel="stylesheet" />
+
+<div class="limiter">
+    <div class="container-login100" >
+        <div class="wrap-login100" style="height:620px !important;">
+            <div class="login100-pic js-tilt" data-tilt style="width:300px !important; margin-top:100px">
+                <img style="border-radius: 10px;object-fit: cover; " src="~/customer/images/doc_sach.jpg" />
+            </div>
+
+            <form class="login100-form validate-form" asp-action="Register" method="post" style="width:450px !important">
+                <span class="login100-form-title">
+                    Đăng ký tài khoản
+                </span>
+
+                <div class="wrap-input100 validate-input">
+                    <input asp-for="FullName" class="input100" placeholder="Họ và tên" />
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+                        <i class="fas fa-user"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="FullName" class="text-danger"></span>
+
+                <div class="wrap-input100 validate-input">
+                    <input asp-for="UserName" class="input100" placeholder="Tên đăng nhập" />
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+                        <i class="fas fa-user-circle"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="UserName" class="text-danger"></span>
+
+                <div class="wrap-input100 validate-input">
+                    <input asp-for="Email" class="input100" placeholder="Email" />
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+                        <i class="fas fa-envelope"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="Email" class="text-danger"></span>
+
+                <div class="wrap-input100 validate-input">
+                    <input asp-for="Phone" class="input100" placeholder="Số điện thoại" />
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+                        <i class="fas fa-phone"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="Phone" class="text-danger"></span>
+
+                <div class="wrap-input100 validate-input">
+                    <input asp-for="Password" class="input100" type="password" placeholder="Mật khẩu" />
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="Password" class="text-danger"></span>
+
+                <div class="wrap-input100 validate-input">
+                    <input asp-for="ConfirmPassword" class="input100" type="password" placeholder="Xác nhận mật khẩu" />
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+                <div class="container-login100-form-btn">
+                    <button type="submit" class="login100-form-btn">
+                        Đăng ký
+                    </button>
+                </div>
+
+                <div class="text-center p-t-15">
+                    <a class="txt2" asp-action="Login">
+                        Đã có tài khoản? Đăng nhập
+                        <i class="fas fa-long-arrow-alt-right m-l-5"></i>
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>

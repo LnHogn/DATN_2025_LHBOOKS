@@ -53,21 +53,28 @@
 
                     <div class="form-group mb-3">
                         <label for="province" class="form-label"><strong>Tỉnh/Thành phố</strong></label>
-                        <select id="province" class="form-control rounded shadow-sm"></select>
+                        <select id="province" class="form-control rounded shadow-sm">
+                            <option value="">---- Chọn tỉnh ----</option>
+                        </select>
                         <input type="hidden" id="ProvinceName" name="Province" value="@Model.Province" />
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="district" class="form-label"><strong>Quận/Huyện</strong></label>
-                        <select id="district" class="form-control rounded shadow-sm" disabled></select>
+                        <select id="district" class="form-control rounded shadow-sm" disabled>
+                            <option value="">---- Chọn quận/huyện ----</option>
+                        </select>
                         <input type="hidden" id="DistrictName" name="District" value="@Model.District" />
                     </div>
 
                     <div class="form-group mb-3">
                         <label for="ward" class="form-label"><strong>Xã/Phường</strong></label>
-                        <select id="ward" class="form-control rounded shadow-sm" disabled></select>
+                        <select id="ward" class="form-control rounded shadow-sm" disabled>
+                            <option value="">---- Chọn xã/phường ----</option>
+                        </select>
                         <input type="hidden" id="WardName" name="Ward" value="@Model.Ward" />
                     </div>
+
 
                     <div class="form-group mb-4">
                         <label asp-for="SpecificAddress" class="form-label"><strong>Địa chỉ cụ thể</strong></label>

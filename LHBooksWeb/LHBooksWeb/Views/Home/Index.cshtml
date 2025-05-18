@@ -57,69 +57,91 @@
 
     <!-- SÁCH NỔI BẬT -->
     <section class="new_arrivals">
-        <div class="container card">
-            <h3><i class="fas fa-star" style="color: #ff4d4f; margin-right: 8px;" ></i>Sách Nổi Bật</h3>
-            @await Component.InvokeAsync("FeaturedBooks")
-            <div class="view-more">
-                <a href="@Url.Action("ViewMore", "BooksByCate", new { type = "Featured" })" style="font-size:17px;">
+        <div class="container">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; background-color: #ffecec; border-radius: 6px;">
+                <h3 style="margin: 0; display: flex; align-items: center; ">
+                    <i class="fas fa-star" style="color: #ff4d4f; margin-right: 8px;"></i>
+                    SÁCH NỔI BẬT
+                </h3>
+                <a href="@Url.Action("ViewMore", "BooksByCate", new { type = "Featured" })" style="font-size: 17px; color: #ff4d4f; text-decoration: none; padding-right:15px">
                     Xem thêm
                 </a>
             </div>
+
+            @await Component.InvokeAsync("FeaturedBooks")
         </div>
     </section>
+
+
 
     <!-- SÁCH HOT -->
     <section class="new_arrivals">
-        <div class="container card">
-            <h3><i class="fas fa-fire" style="color: #ff4d4f; margin-right: 8px;"></i>Sách Hot</h3>
-            @await Component.InvokeAsync("HotBooks")
-            <div class="view-more">
-                <a href="@Url.Action("ViewMore", "BooksByCate", new { type = "Hot" })" style="font-size:17px;">
+        <div class="container">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; background-color: #ffecec; border-radius: 6px;">
+                <h3 style="margin: 0; display: flex; align-items: center;">
+                    <i class="fas fa-fire" style="color: #ff4d4f; margin-right: 8px;"></i>
+                    SÁCH HOT
+                </h3>
+                <a href="@Url.Action("ViewMore", "BooksByCate", new { type = "Hot" })" style="font-size: 17px; color: #ff4d4f; text-decoration: none; padding-right: 15px;">
                     Xem thêm
                 </a>
             </div>
+
+            @await Component.InvokeAsync("HotBooks")
         </div>
     </section>
 
-    <!-- SÁCH bán chạy -->
+
+    <!-- SÁCH BÁN CHẠY -->
     <section class="new_arrivals">
-        <div class="container card">
-            <h3>
-                <i class="fas fa-chart-line" style="color: #ff4d4f; margin-right: 8px;"></i>
-                Xu hướng mua sắm
-            </h3>
-            @await Component.InvokeAsync("BestSellerBooks")
-            <div class="view-more">
-                <a href="@Url.Action("ViewMore", "BooksByCate", new { type = "BestSeller" })" style="font-size:17px;">
+        <div class="container">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; background-color: #ffecec; border-radius: 6px;">
+                <h3 style="margin: 0; display: flex; align-items: center;">
+                    <i class="fas fa-chart-line" style="color: #ff4d4f; margin-right: 8px;"></i>
+                    Xu hướng mua sắm
+                </h3>
+                <a href="@Url.Action("ViewMore", "BooksByCate", new { type = "BestSeller" })" style="font-size: 17px; color: #ff4d4f; text-decoration: none; padding-right: 15px;">
                     Xem thêm
                 </a>
             </div>
+
+            @await Component.InvokeAsync("BestSellerBooks")
         </div>
     </section>
+
 
     <!-- SÁCH KHUYẾN MẠI -->
     <section class="new_arrivals">
-        <div class="container card">
-            <h3><i class="fas fa-tags" style="color: #ff4d4f; margin-right: 8px;"></i>Sách Khuyến Mại</h3>
-            @await Component.InvokeAsync("SaleBooks")
-            <div class="view-more">
-                <a href="@Url.Action("ViewMore", "BooksByCate", new { type = "Sale" })" style="font-size:17px;">
+        <div class="container">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; background-color: #ffecec; border-radius: 6px;">
+                <h3 style="margin: 0; display: flex; align-items: center;">
+                    <i class="fas fa-tags" style="color: #ff4d4f; margin-right: 8px;"></i>
+                    Sách Khuyến Mại
+                </h3>
+                <a href="@Url.Action("ViewMore", "BooksByCate", new { type = "Sale" })" style="font-size: 17px; color: #ff4d4f; text-decoration: none; padding-right: 15px;">
                     Xem thêm
                 </a>
             </div>
+
+            @await Component.InvokeAsync("SaleBooks")
         </div>
     </section>
 
+
     <!-- SÁCH MỚI PHÁT HÀNH -->
     <section class="new_arrivals">
-        <div class="container card">
-            <h3><i class="fas fa-book" style="color: #ff4d4f; margin-right: 8px;"></i>Sách Mới Phát Hành</h3>
-            @await Component.InvokeAsync("NewBooks")
-            <div class="view-more">
-                <a href="@Url.Action("ViewMore", "BooksByCate", new { type = "NewRelease" })" style="font-size:17px;">
-                   Xem thêm
+        <div class="container">
+            <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; background-color: #ffecec; border-radius: 6px;">
+                <h3 style="margin: 0; display: flex; align-items: center;">
+                    <i class="fas fa-book" style="color: #ff4d4f; margin-right: 8px;"></i>
+                    Sách Mới Phát Hành
+                </h3>
+                <a href="@Url.Action("ViewMore", "BooksByCate", new { type = "NewRelease" })" style="font-size: 17px; color: #ff4d4f; text-decoration: none; padding-right: 15px;">
+                    Xem thêm
                 </a>
             </div>
+
+            @await Component.InvokeAsync("NewBooks")
         </div>
     </section>
 

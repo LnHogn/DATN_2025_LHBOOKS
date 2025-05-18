@@ -14,55 +14,6 @@ namespace LHBooksWeb.Controllers
             _productService = productService;
         }
 
-        //public IActionResult ViewMore(string type)
-        //{
-        //    BookViewType viewType;
-
-        //    if (!Enum.TryParse(type, true, out viewType))
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    IEnumerable<Product> products;
-        //    string title = "", keyword = "";
-
-        //    switch (viewType)
-        //    {
-        //        case BookViewType.Featured:
-        //            products = _productService.GetFeaturedBooks();
-        //            title = "Sách Nổi Bật";
-        //            keyword = "Sách Nổi Bật";
-        //            break;
-        //        case BookViewType.Hot:
-        //            products = _productService.GetHotBooks();
-        //            title = "Sách Hot";
-        //            keyword = "Sách Hot";
-        //            break;
-        //        case BookViewType.BestSeller:
-        //            products = _productService.GetBestSellerBooks();
-        //            title = "Xu hướng mua sắm";
-        //            keyword = "Xu hướng mua sắm";
-        //            break;
-        //        case BookViewType.Sale:
-        //            products = _productService.GetSaleBooks();
-        //            title = "Sách Khuyến Mại";
-        //            keyword = "Sách Khuyến Mại";
-        //            break;
-        //        case BookViewType.NewRelease:
-        //            products = _productService.GetNewBooks();
-        //            title = "Sách Mới Phát Hành";
-        //            keyword = "Sách Mới Phát Hành";
-        //            break;
-        //        default:
-        //            products = new List<Product>();
-        //            break;
-        //    }
-
-        //    ViewData["Title"] = title;
-        //    ViewBag.Keyword = keyword;
-
-        //    return View(products);
-        //}
 
         public IActionResult ViewMore(string type, bool showAll = false)
         {

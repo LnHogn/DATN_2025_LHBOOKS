@@ -17,7 +17,7 @@ namespace LHBooksWeb.Services
         }
 
         // Thêm sản phẩm vào giỏ hàng
-        public async Task AddToCartAsync(int productId, string productName, string productImage, decimal price, int quantity)
+        public async Task AddToCartAsync(int productId, string productName, string productImage, decimal price, int quantity, bool isSelected)
         {
             var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrEmpty(userId))
@@ -39,7 +39,8 @@ namespace LHBooksWeb.Services
                     ProductImage = productImage,
                     Price = price,
                     Quantity = quantity,
-                    UserId = userId
+                    UserId = userId,
+                    IsSelected = isSelected
                 };
                 _context.CartItems.Add(cartItem);
             }

@@ -50,7 +50,8 @@ namespace LHBooksWeb.Controllers
             return View(order);
         }
 
-        [HttpGet]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult CancelOrder(int orderId)
         {
             var order = _context.Orders

@@ -16,9 +16,9 @@
     box-sizing: border-box;
 }
 
-.product-grid_hone .product-item_hone:nth-child(n+11) {
+/*.product-grid_hone .product-item_hone:nth-child(n+11) {
     display: none;
-}
+}*/
 
 .main_content_hone{
     float:left;

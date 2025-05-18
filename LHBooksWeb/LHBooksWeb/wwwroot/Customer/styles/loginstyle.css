@@ -1,0 +1,275 @@
+﻿:root {
+    --primary-color: #6675df;
+    --secondary-color: #333;
+    --text-color: #666;
+    --border-color: #e6e6e6;
+    --bg-color: #f8f9fd;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.limiter {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.container-login100 {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+    background: var(--bg-color);
+    margin-top: 80px;
+}
+
+.wrap-login100 {
+    width: 900px;
+    height: 450px;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 50px 50px 50px 50px;
+    box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Login Picture */
+.login100-pic {
+    width: 420px;
+    object-fit: contain;
+    border-radius: 10px;
+    height: 280px;
+    margin-top: 15px;
+}
+
+    .login100-pic img {
+        max-width: 100%;
+    }
+
+/* Form */
+.login100-form {
+    width: 290px;
+}
+
+.login100-form-title {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 24px;
+    color: var(--secondary-color);
+    line-height: 1.2;
+    text-align: center;
+    width: 100%;
+    display: block;
+    padding-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Input */
+.wrap-input100 {
+    position: relative;
+    width: 100%;
+    z-index: 1;
+    margin-bottom: 10px;
+}
+
+.input100 {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--secondary-color);
+    display: block;
+    width: 100%;
+    background: #f7f7f7;
+    height: 35px;
+    border-radius: 25px;
+    padding: 0 30px 0 68px;
+    border: none;
+    outline: none;
+    transition: all 0.4s;
+}
+
+    .input100:focus {
+        background: #e8f0fe;
+    }
+
+/* Focus Input */
+.focus-input100 {
+    display: block;
+    position: absolute;
+    border-radius: 25px;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+    box-shadow: 0px 0px 0px 0px;
+    color: var(--primary-color);
+    transition: all 0.4s;
+}
+
+.input100:focus + .focus-input100 {
+    box-shadow: 0px 0px 0px 2px var(--primary-color);
+}
+
+/* Symbol Input */
+.symbol-input100 {
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    border-radius: 25px;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding-left: 35px;
+    pointer-events: none;
+    color: var(--text-color);
+    transition: all 0.4s;
+}
+
+.input100:focus + .focus-input100 + .symbol-input100 {
+    color: var(--primary-color);
+    padding-left: 28px;
+}
+
+/* Password Toggle */
+.password-toggle {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    z-index: 10;
+}
+
+    .password-toggle:hover {
+        color: var(--primary-color);
+    }
+
+/* Remember Checkbox */
+.remember-forgot {
+    margin-bottom: 10px;
+}
+
+/* Button */
+.container-login100-form-btn {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 20px;
+}
+
+.login100-form-btn {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: #fff;
+    text-transform: uppercase;
+    width: 100%;
+    height: 40px;
+    border-radius: 25px;
+    background: #fe4c50;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 25px;
+    border: none;
+    outline: none;
+    transition: all 0.4s;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+    .login100-form-btn:hover {
+        opacity: 80%;
+        transform: translateY(-2px);
+    }
+
+/* Text links */
+.text-center {
+    text-align: center;
+}
+
+.p-t-15 {
+    padding-top: 15px;
+}
+
+.p-t-136 {
+    padding-top: 110px;
+}
+
+.txt1 {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-color);
+}
+
+.txt2 {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #fe4c50;
+    text-decoration: none;
+    transition: all 0.4s;
+}
+
+    .txt2:hover {
+        text-decoration: underline;
+        opacity: 80%;
+    }
+
+/* Alert box */
+.alert {
+    border-radius: 8px;
+    margin-bottom: 5px;
+    height:65px;
+}
+
+/* Responsive */
+@@media (max-width: 992px) {
+    .wrap-login100 {
+        padding: 177px 90px 33px 85px;
+    }
+
+    .login100-pic {
+        width: 35%;
+    }
+
+    .login100-form {
+        width: 50%;
+    }
+}
+
+@@media (max-width: 768px) {
+    .wrap-login100 {
+        padding: 100px 80px 33px 80px;
+    }
+
+    .login100-pic {
+        display: none;
+    }
+
+    .login100-form {
+        width: 100%;
+    }
+}
+
+@@media (max-width: 576px) {
+    .wrap-login100 {
+        padding: 100px 15px 33px 15px;
+    }
+}

@@ -21,7 +21,8 @@
     <link href="~/lib/content/content/toastr.css" rel="stylesheet" />
     <link href="~/customer/styles/home_product_style.css" rel="stylesheet" />
     <link href="~/lib/sweetarlet/package/dist/sweetalert2.css" rel="stylesheet" />
-
+    <link href="~/adminlib/datatable/datatables.css" rel="stylesheet" />
+    <script src="~/adminlib/datatable/datatables.js"></script>
 </head>
 
 <body>
@@ -203,6 +204,7 @@
     <script src="~/customer/plugins/isotope/isotope.pkgd.min.js"></script>
     <script src="~/customer/styles/bootstrap4/bootstrap.bundle.min.js"></script>
     <script src="~/lib/sweetarlet/package/dist/sweetalert2.all.min.js"></script>
+
     <script>
         toastr.options = {
             "closeButton": true,
@@ -225,6 +227,27 @@
             }
         });
     </script>
+    <script>
+        const commonOptions = {
+            language: {
+                "lengthMenu": "Hiển thị _MENU_ dòng",
+                "zeroRecords": "Không tìm thấy dữ liệu",
+                "info": "Hiển thị _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "infoEmpty": "Không có dữ liệu để hiển thị",
+                "infoFiltered": "(được lọc từ tổng số _MAX_ dòng)",
+                "search": "Tìm kiếm:",
+                "emptyTable": "Không có dữ liệu",
+            }
+        };
+        $(document).ready(function () {
+            $('#myTable').DataTable({
+                ...commonOptions,
+                order: [],
+            });
+        });
+    </script>
+
+
 </body>
 
 </html>

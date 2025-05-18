@@ -1,4 +1,5 @@
 ﻿using LHBooksWeb.Data;
+using LHBooksWeb.Models.EF;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,8 +21,9 @@ namespace LHBooksWeb.ViewComponents
                 .Include(p => p.ProductImage)
                 .Include(p => p.FlashSaleProducts).ThenInclude(fsp => fsp.FlashSale)
                 .Include(p => p.OrderDetails)
-
-                .OrderByDescending(p => p.OrderDetails.Sum(od => od.Quantity))
+                .OrderByDescending(p => p.OrderDetails
+                .Where(od => od.Order.Status == OrderStatus.Delivered)
+                .Sum(od => od.Quantity))
                 .Take(10)
                 .ToList();
 

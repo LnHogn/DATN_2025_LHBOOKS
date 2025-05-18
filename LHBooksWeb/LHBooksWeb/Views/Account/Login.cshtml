@@ -1,52 +1,79 @@
-﻿@model LHBooksWeb.Models.ViewModels.LoginViewModel
+﻿
 
+ @model LHBooksWeb.Models.ViewModels.LoginViewModel
 @{
     ViewData["Title"] = "Đăng nhập";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
 }
-
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh; margin-top:80px;">
-    <div class="card shadow-sm p-4" style="width: 100%; max-width: 400px;">
-        <h2 class="text-center mb-4" style="font-size: 2rem;">Đăng nhập</h2>
-
-        <form asp-action="Login" method="post">
-            @if (ViewBag.IsLockedMessage != null)
-            {
-                <div class="alert alert-danger">
-                    @ViewBag.IsLockedMessage
-                </div>
-            }
-            <div class="form-group mb-4">
-                <label asp-for="UserName" class="form-label" style="font-size: 1.1rem;"></label>
-                <input asp-for="UserName" class="form-control" placeholder="Nhập tên đăng nhập" style="font-size: 1.1rem;" />
-                <span asp-validation-for="UserName" class="text-danger"></span>
+<link href="~/customer/styles/loginstyle.css" rel="stylesheet" />
+<div class="limiter">
+    <div class="container-login100">
+        <div class="wrap-login100">
+            <div class="login100-pic js-tilt" data-tilt>
+                <img style="border-radius: 10px;object-fit: cover;" src="~/customer/images/doc_sach.jpg" />
             </div>
 
-            <div class="form-group mb-4">
-                <label asp-for="Password" class="form-label" style="font-size: 1.1rem;"></label>
-                <div class="input-group">
-                    <input asp-for="Password" class="form-control" type="password" id="passwordInput" placeholder="Nhập mật khẩu" style="font-size: 1.1rem;" />
-                    <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()" tabindex="-1">
+            <form class="login100-form validate-form" asp-action="Login" method="post">
+                <span class="login100-form-title">
+                    Đăng nhập
+                </span>
+
+                @if (ViewBag.IsLockedMessage != null)
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        @ViewBag.IsLockedMessage
+                    </div>
+                }
+
+                <div class="wrap-input100 validate-input">
+                    <input asp-for="UserName" class="input100" type="text" placeholder="Tên đăng nhập">
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+                        <i class="fas fa-user"></i>
+                    </span>
+                </div>
+                <span asp-validation-for="UserName" class="text-danger"></span>
+
+                <div class="wrap-input100 validate-input">
+                    <input asp-for="Password" class="input100" type="password" id="passwordInput" placeholder="Mật khẩu">
+                    <span class="focus-input100"></span>
+                    <span class="symbol-input100">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <button type="button" class="password-toggle" onclick="togglePassword()" tabindex="-1">
                         <i class="fas fa-eye" id="toggleIcon"></i>
                     </button>
                 </div>
                 <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
 
-            <div class="form-check mb-4" style="font-size: 1.1rem;">
-                <input asp-for="RememberMe" class="form-check-input" />
-                <label asp-for="RememberMe" class="form-check-label"></label>
-            </div>
+                <div class="remember-forgot">
+                    <div class="form-check">
+                        <input asp-for="RememberMe" class="form-check-input" id="rememberMe">
+                        <label asp-for="RememberMe" class="form-check-label" for="rememberMe">Ghi nhớ đăng nhập</label>
+                    </div>
+                </div>
 
-            <div class="d-grid text-center mb-2">
-                <button type="submit" class="btn btn-primary" style="font-size: 1.1rem;">Đăng nhập</button>
-            </div>
-        </form>
+                <div class="container-login100-form-btn">
+                    <button type="submit" class="login100-form-btn">
+                        Đăng nhập
+                    </button>
+                </div>
 
-        <div class="text-center mt-3">
-            <small style="font-size: 1.1rem;">Chưa có tài khoản? <a asp-action="Register">Đăng ký</a></small>
-        </div>
-        <div class="text-center mt-3">
-            <small style="font-size: 1.1rem;"> <a asp-action="ForgotPassword">Quên mật khẩu?</a></small>
+                <div class="text-center p-t-15">
+                    <a class="txt2" asp-action="ForgotPassword">
+                        Quên mật khẩu?
+                    </a>
+                </div>
+
+                <div class="text-center" style="padding-top:10px;">
+                    <a class="txt2" asp-action="Register">
+                        Tạo tài khoản mới
+                        <i class="fas fa-long-arrow-alt-right m-l-5"></i>
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -66,5 +93,14 @@
                 toggleIcon.classList.add('fa-eye');
             }
         }
+        
+        // Thêm hiệu ứng tilt cho hình ảnh nếu thư viện tilt.js được cài đặt
+        $(document).ready(function(){
+            if (typeof $.fn.tilt === 'function') {
+                $('.js-tilt').tilt({
+                    scale: 1.1
+                });
+            }
+        });
     </script>
 }

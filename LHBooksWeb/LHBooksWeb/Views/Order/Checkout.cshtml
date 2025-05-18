@@ -28,6 +28,12 @@
             </ol>
         </nav>
         <h2>Thanh toán đơn hàng</h2>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">
+                <p>@TempData["ErrorMessage"]</p>
+            </div>
+        }
 
         <div class="row">
             <div class="col-md-5">
@@ -52,7 +58,12 @@
                             <div class="form-group mb-3">
                                 <label>Địa chỉ:</label>
                                 <textarea class="form-control" rows="3" readonly>@Model.Address</textarea>
+                                @if (Model.Address?.Trim() == "Chưa có địa chỉ")
+                                {
+                                    <d class="text-danger">Vui lòng nhập địa chỉ.</d>
+                                }
                             </div>
+
 
                             <a href="/Account/EditProfile?returnUrl=@Uri.EscapeDataString(Context.Request.Path + Context.Request.QueryString)" class="btn btn-success btn-sm">Chỉnh sửa thông tin</a>
 
