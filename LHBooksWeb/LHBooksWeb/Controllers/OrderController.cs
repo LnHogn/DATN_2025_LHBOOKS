@@ -126,9 +126,10 @@ namespace LHBooksWeb.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
+                TempData["ErrorMessage"] = ex.Message;
                 return RedirectToAction("Checkout");
             }
+
         }
 
 

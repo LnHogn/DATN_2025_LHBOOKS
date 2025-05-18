@@ -118,6 +118,11 @@ namespace LHBooksWeb.Services
                 throw new Exception("Không tìm thấy thông tin người dùng");
             }
 
+            if(user.Address == "Chưa có địa chỉ")
+            {
+                throw new Exception("Vui lòng nhập địa chỉ");
+            }
+
             var cartItems = await _cartService.GetSelectedCartItemsAsync();
             if (cartItems.Count == 0)
             {
