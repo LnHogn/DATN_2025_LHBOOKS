@@ -149,16 +149,9 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label asp-for="AuthorName" class="control-label">Tác Giả</label>
-
-                                        <input type="text" id="authorInput" class="form-control"
-                                               value="@Model.AuthorName"
-                                               placeholder="Nhập tên tác giả" autocomplete="off" />
-
-                                        <input type="hidden" id="authorId" name="AuthorName" value="@Model.AuthorName" />
-
+                                        <label asp-for="AuthorName" class="control-label">Tên tác giả</label>
+                                        <input asp-for="AuthorName" class="form-control" />
                                         <span asp-validation-for="AuthorName" class="text-danger"></span>
-
                                     </div>
                                 </div>
                                 <div class="col-md-3">
@@ -410,26 +403,26 @@
     </script>
 
     <script>
-        $(function () {
-            $("#authorInput").autocomplete({
-                source: function (request, response) {
-                    $.ajax({
-                        url: '/Admin/Author/SearchAuthors', // sửa cho đúng route nếu cần
-                        type: 'GET',
-                        data: { term: request.term },
-                        success: function (data) {
-                            response(data);
-                        }
-                    });
-                },
-                minLength: 2,
-                select: function (event, ui) {
-                    $("#authorInput").val(ui.item.label);  // tên
-                    $("#authorId").val(ui.item.label);        // id
-                    return false;
-                }
-            });
-        });
+        // $(function () {
+        //     $("#authorInput").autocomplete({
+        //         source: function (request, response) {
+        //             $.ajax({
+        //                 url: '/Admin/Author/SearchAuthors', // sửa cho đúng route nếu cần
+        //                 type: 'GET',
+        //                 data: { term: request.term },
+        //                 success: function (data) {
+        //                     response(data);
+        //                 }
+        //             });
+        //         },
+        //         minLength: 2,
+        //         select: function (event, ui) {
+        //             $("#authorInput").val(ui.item.label);  // tên
+        //             $("#authorId").val(ui.item.label);        // id
+        //             return false;
+        //         }
+        //     });
+        // });
 
         $(function () {
             $("#PublisherInput").autocomplete({
