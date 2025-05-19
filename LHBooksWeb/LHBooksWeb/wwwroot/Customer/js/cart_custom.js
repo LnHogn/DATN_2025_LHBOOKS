@@ -50,19 +50,23 @@
                         }
                     });
                 } else {
-                    toastr.error("Thêm thất bại");
+                    toastr.error(res.message);
                 }
             },
             error: function (xhr) {
-    if (xhr.status === 401) {
-        toastr.warning("Bạn cần đăng nhập để thêm sản phẩm.");
-        setTimeout(() => {
-            window.location.href = '/Account/Login';
-        }, 1500);
-    } else {
-        toastr.error("Thêm thất bại");
-    }
-}
+                if (xhr.status === 401) {
+                    toastr.warning("Bạn cần đăng nhập để thêm sản phẩm.");
+                    setTimeout(() => {
+                    window.location.href = '/Account/Login';
+                    }, 1500);
+                } else {
+                    let errorMsg = "Đã xảy ra lỗi khi gửi yêu cầu.";
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    toastr.error(errorMsg);
+                }
+            }
         });
     });
 
@@ -93,7 +97,7 @@
                     // Sau khi thêm vào giỏ, chuyển sang trang giỏ hàng
                     window.location.href = '/Cart/Index';
                 } else {
-                    toastr.error("Thêm thất bại");
+                    toastr.error(res.message);
                 }
             },
             error: function (xhr) {
@@ -103,7 +107,11 @@
                         window.location.href = '/Account/Login';
                     }, 1500);
                 } else {
-                    toastr.error("Thêm thất bại");
+                    let errorMsg = "Đã xảy ra lỗi khi gửi yêu cầu.";
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMsg = xhr.responseJSON.message;
+                    }
+                    toastr.error(errorMsg);
                 }
             }
         });

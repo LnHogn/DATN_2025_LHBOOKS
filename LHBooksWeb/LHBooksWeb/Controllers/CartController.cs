@@ -38,18 +38,40 @@ namespace LHBooksWeb.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddToCart(int productId, string productName, string productImage, decimal price, int quantity , bool isSelected)
+        public async Task<IActionResult> AddToCart(int productId, string productName, string productImage, decimal price, int quantity, bool isSelected)
         {
-            await _cartService.AddToCartAsync(productId, productName, productImage, price, quantity, isSelected);
-            return Json(new { success = true, message = "Đã thêm sản phẩm vào giỏ hàng" });
+            try
+            {
+                await _cartService.AddToCartAsync(productId, productName, productImage, price, quantity, isSelected);
+                return Json(new { success = true, message = "Đã thêm sản phẩm vào giỏ hàng" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Lỗi nghiệp vụ như tồn kho
+                return Json(new { error = true, message = ex.Message });
+            }
+            catch (Exception)
+            {
+                // Lỗi không xác định
+                return Json(new { success = false, message = "Đã xảy ra lỗi khi thêm vào giỏ hàng" });
+            }
         }
+
 
 
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> UpdateQuantity(int cartItemId, int quantity)
         {
-            await _cartService.UpdateQuantityAsync(cartItemId, quantity);
+            try
+            {
+                await _cartService.UpdateQuantityAsync(cartItemId, quantity);
+                TempData["success"] = "Cập nhật số lượng thành công!";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["error"] = ex.Message;
+            }
             return RedirectToAction("Index");
         }
 

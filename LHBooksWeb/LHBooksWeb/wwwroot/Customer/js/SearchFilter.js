@@ -94,7 +94,7 @@
                             }
                         });
                     } else {
-                        toastr.error("Thêm thất bại");
+                        toastr.error(res.message);
                     }
                 },
                 error: function (xhr) {
@@ -104,7 +104,11 @@
                             window.location.href = '/Account/Login';
                         }, 1500);
                     } else {
-                        toastr.error("Thêm thất bại");
+                        let errorMsg = "Đã xảy ra lỗi khi gửi yêu cầu.";
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                        toastr.error(errorMsg);
                     }
                 }
             });
