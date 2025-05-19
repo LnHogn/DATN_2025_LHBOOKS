@@ -25,10 +25,24 @@ namespace LHBooksWeb.Services
                 throw new Exception("Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng");
             }
 
-            var cartItem = await _context.CartItems.FirstOrDefaultAsync(c => c.ProductId == productId && c.UserId == userId);
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == productId);
+            if (product == null)
+            {
+                throw new InvalidOperationException("Sản phẩm không tồn tại.");
+            }
+
+            var cartItem = await _context.CartItems
+                .FirstOrDefaultAsync(c => c.ProductId == productId && c.UserId == userId);
+
+            int totalQuantity = (cartItem?.Quantity ?? 0) + quantity;
+            if (totalQuantity > product.Quantity)
+            {
+                throw new InvalidOperationException("Sản phẩm không đủ hàng trong kho.");
+            }
+
             if (cartItem != null)
             {
-                cartItem.Quantity += quantity;
+                cartItem.Quantity = totalQuantity;
             }
             else
             {
@@ -44,10 +58,12 @@ namespace LHBooksWeb.Services
                 };
                 _context.CartItems.Add(cartItem);
             }
+
             await _context.SaveChangesAsync();
         }
 
- 
+
+
 
         // Lấy tất cả sản phẩm trong giỏ hàng
         public async Task<List<CartItem>> GetCartItemsAsync()
@@ -82,17 +98,33 @@ namespace LHBooksWeb.Services
         public async Task UpdateQuantityAsync(int cartItemId, int quantity)
         {
             var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var cartItem = await _context.CartItems.FirstOrDefaultAsync(c => c.Id == cartItemId && c.UserId == userId);
+
+            var cartItem = await _context.CartItems
+                .Include(c => c.Product) // để truy cập tồn kho sản phẩm
+                .FirstOrDefaultAsync(c => c.Id == cartItemId && c.UserId == userId);
+
             if (cartItem != null)
             {
-                cartItem.Quantity = quantity;
-                if (cartItem.Quantity <= 0)
+                if (quantity <= 0)
                 {
+                    // Nếu số lượng yêu cầu <= 0 thì xóa khỏi giỏ hàng
                     _context.CartItems.Remove(cartItem);
                 }
+                else if (quantity > cartItem.Product.Quantity)
+                {
+                    // Nếu yêu cầu vượt quá tồn kho, không cập nhật và có thể báo lỗi
+                    throw new InvalidOperationException("Sản phẩm không đủ hàng trong kho.");
+                }
+                else
+                {
+                    // Hợp lệ: cập nhật số lượng
+                    cartItem.Quantity = quantity;
+                }
+
                 await _context.SaveChangesAsync();
             }
         }
+
 
         // Xóa sản phẩm khỏi giỏ hàng
         public async Task RemoveFromCartAsync(int cartItemId)
