@@ -38,6 +38,14 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Kiểm tra trùng tên
+                bool isExist = await db.Publishers.AnyAsync(p => p.Name == publisher.Name);
+                if (isExist)
+                {
+                    TempData["ErrorMessage"] = "Tên nhà xuất bản đã tồn tại.";
+                    return View(publisher);
+                }
+
                 db.Publishers.Add(publisher);
                 await db.SaveChangesAsync();
                 TempData["SuccessMessage"] = $"NXB '{publisher.Name}' đã được thêm thành công";
@@ -45,6 +53,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
             }
             return View(publisher);
         }
+
 
         public async Task<IActionResult> Edit(int id)
         {
