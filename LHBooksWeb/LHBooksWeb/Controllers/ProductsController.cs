@@ -250,24 +250,92 @@ namespace LHBooksWeb.Controllers
 
 
 
+        //public async Task<IActionResult> RelatedProducts(int subCategoryId, string authorName, int currentProductId)
+        //{
+        //    var relatedProducts = await _context.Products
+        //        .Where(p =>
+        //            p.IsActive &&
+        //            p.Id != currentProductId &&
+        //            (p.ProductSubCategoryId == subCategoryId || p.AuthorName == authorName)
+        //        )
+        //        .Include(p => p.ProductImage)
+        //        .Include(p => p.Publisher)
+        //        .Include(p => p.FlashSaleProducts).ThenInclude(fsp => fsp.FlashSale)
+        //        .OrderByDescending(p => p.ViewCount)
+        //        .Take(6)
+        //        .ToListAsync();
+
+
+        //    return PartialView("_RelatedProducts", relatedProducts);
+        //}
+
         public async Task<IActionResult> RelatedProducts(int subCategoryId, string authorName, int currentProductId)
         {
-            var relatedProducts = await _context.Products
-                .Where(p =>
-                    p.IsActive &&
-                    p.Id != currentProductId &&
-                    (p.ProductSubCategoryId == subCategoryId || p.AuthorName == authorName)
-                )
-                .Include(p => p.ProductImage)
-                .Include(p => p.Publisher)
-                .Include(p => p.FlashSaleProducts).ThenInclude(fsp => fsp.FlashSale)
-                .OrderByDescending(p => p.ViewCount)
-                .Take(6)
-                .ToListAsync();
+            var user = await _userManager.GetUserAsync(User);
+            List<Product> relatedProducts;
+
+            if (user != null)
+            {
+                // Lấy danh sách các sản phẩm người dùng đã mua
+                var purchasedProductIds = await _context.OrderDetails
+                    .Where(od => od.Order.UserId == user.Id)
+                    .Select(od => od.ProductId)
+                    .ToListAsync();
+
+                // Lấy các thể loại con và tác giả người dùng mua nhiều nhất
+                var topSubCategories = await _context.OrderDetails
+                    .Where(od => od.Order.UserId == user.Id)
+                    .GroupBy(od => od.Product.ProductSubCategoryId)
+                    .OrderByDescending(g => g.Sum(x => x.Quantity))
+                    .Select(g => g.Key)
+                    .Take(2)
+                    .ToListAsync();
+
+                var topAuthors = await _context.OrderDetails
+                    .Where(od => od.Order.UserId == user.Id)
+                    .GroupBy(od => od.Product.AuthorName)
+                    .OrderByDescending(g => g.Sum(x => x.Quantity))
+                    .Select(g => g.Key)
+                    .Take(2)
+                    .ToListAsync();
+
+                relatedProducts = await _context.Products
+                    .Where(p =>
+                        p.IsActive &&
+                        p.Id != currentProductId &&
+                        (
+                            p.ProductSubCategoryId == subCategoryId ||
+                            p.AuthorName == authorName ||
+                            topSubCategories.Contains(p.ProductSubCategoryId) ||
+                            topAuthors.Contains(p.AuthorName)
+                        )
+                    )
+                    .Include(p => p.ProductImage)
+                    .Include(p => p.Publisher)
+                    .Include(p => p.FlashSaleProducts).ThenInclude(fsp => fsp.FlashSale)
+                    .OrderByDescending(p => p.ViewCount)
+                    .Take(6)
+                    .ToListAsync();
+            }
+            else
+            {
+                // Logic cũ cho người chưa đăng nhập
+                relatedProducts = await _context.Products
+                    .Where(p =>
+                        p.IsActive &&
+                        p.Id != currentProductId &&
+                        (p.ProductSubCategoryId == subCategoryId || p.AuthorName == authorName)
+                    )
+                    .Include(p => p.ProductImage)
+                    .Include(p => p.Publisher)
+                    .Include(p => p.FlashSaleProducts).ThenInclude(fsp => fsp.FlashSale)
+                    .OrderByDescending(p => p.ViewCount)
+                    .Take(6)
+                    .ToListAsync();
+            }
 
             return PartialView("_RelatedProducts", relatedProducts);
         }
-
 
     }
 }
