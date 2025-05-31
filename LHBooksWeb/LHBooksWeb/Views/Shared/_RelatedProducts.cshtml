@@ -1,5 +1,20 @@
 ﻿@model IEnumerable<Product>
 
+<style>
+    .swiper-scrollbar {
+        background: #ccc; /* Màu nền xám nhạt */
+        height: 20px; /* Độ cao to hơn mặc định */
+        margin-top: 15px !important;
+        bottom:0 !important;
+    }
+
+    .swiper-scrollbar-drag {
+        background: #888; /* Màu xám đậm cho thanh kéo */
+        border-radius: 5px;
+    }
+
+</style>
+
 
 <h4 class="mt-4 me-2">Sản phẩm liên quan</h4>
 <div class="swiper mySwiper">
@@ -73,27 +88,16 @@
         }
     </div>
 
-    <div class="swiper-button-next"></div>
-    <div class="swiper-button-prev"></div>
-    <div class="swiper-pagination"></div>
+    <div class="swiper-scrollbar"></div>
 </div>
 
 <script>
     const swiper = new Swiper('.mySwiper', {
-        loop: true,
         slidesPerView: 2,
         spaceBetween: 15,
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        autoplay: {
-            delay: 3000,
-            disableOnInteraction: false,
+        scrollbar: {
+            el: '.swiper-scrollbar',
+            draggable: true,
         },
         breakpoints: {
             576: { slidesPerView: 2 },
@@ -102,4 +106,5 @@
             1200: { slidesPerView: 5 },
         }
     });
+
 </script>
