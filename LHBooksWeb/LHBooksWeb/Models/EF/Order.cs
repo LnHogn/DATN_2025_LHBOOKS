@@ -62,8 +62,8 @@ namespace LHBooksWeb.Models.EF
         public Order()
         {
             this.OrderDetails = new HashSet<OrderDetail>();
-            this.OrderDate = DateTime.Now;
-            this.Code = GenerateOrderCode();
+            //this.OrderDate = DateTime.Now;
+            //this.Code = GenerateOrderCode();
         }
 
         private string GenerateOrderCode()
