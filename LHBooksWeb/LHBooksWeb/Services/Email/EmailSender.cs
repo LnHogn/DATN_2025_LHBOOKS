@@ -7,7 +7,7 @@ namespace LHBooksWeb.Services.Email
 {
     public class EmailSender : IEmailSender
     {
-        public Task SendEmailAsync(string email, string subject, string message)
+        public Task SendEmailAsync(string email, string subject, string message, bool isHTML = true)
         {
             var client = new SmtpClient("smtp.gmail.com", 587)
             {
@@ -16,11 +16,17 @@ namespace LHBooksWeb.Services.Email
                 Credentials = new NetworkCredential("honglam.27012003@gmail.com", "wtcgtrbweyctzquj")
             };
 
-            return client.SendMailAsync(
-                new MailMessage(from: "demologin979@gmail.com",
+            var mailMessage = new MailMessage(
+                from: "honglam.27012003@gmail.com",
                 to: email,
                 subject: subject,
-                message));
+                message
+            );
+
+            // Thiết lập định dạng HTML cho email
+            mailMessage.IsBodyHtml = isHTML;
+
+            return client.SendMailAsync(mailMessage);
         }
     }
 }
