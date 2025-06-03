@@ -199,11 +199,32 @@
                 }).then((result) => {
                     if (result.isConfirmed) {
                         Swal.fire("Cập nhật thành công!", "", "success");
-                        // Cập nhật nội dung trong bảng
-                        $(`#trangthai-${id}`).text(reverseStatusOptions[result.value]);
-                        setTimeout(function () {
-                            location.reload();
-                        }, 700);
+
+                        var newStatus = parseInt(result.value);
+                        var newText = reverseStatusOptions[newStatus];
+
+                        // Cập nhật text
+                        $(`#trangthai-${id}`).text(newText);
+
+                        // Cập nhật màu badge
+                        var badgeClass = "badge ";
+                        switch (newStatus) {
+                            case 0: badgeClass += "badge-warning"; break;
+                            case 1: badgeClass += "badge-danger"; break;
+                            case 2: badgeClass += "badge-secondary"; break;
+                            case 3: badgeClass += "badge-primary"; break;
+                            case 4: badgeClass += "badge-info"; break;
+                            case 5: badgeClass += "badge-success"; break;
+                            case 6: badgeClass += "badge-dark"; break;
+                            case 7: badgeClass += "badge-success"; break;
+                            default: badgeClass += "badge-light"; break;
+                        }
+
+                        // Cập nhật class của badge (xóa class cũ và thêm mới)
+                        $(`#trangthai-${id}`)
+                            .removeClass()
+                            .addClass(`${badgeClass} fs-6 py-2 px-3`)
+                            .css("font-size", "90%");
                     }
                 });
             });

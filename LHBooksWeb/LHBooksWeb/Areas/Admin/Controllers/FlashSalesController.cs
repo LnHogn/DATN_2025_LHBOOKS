@@ -132,10 +132,10 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                 return RedirectToAction("Details", new { id = flashSaleId });
             }
 
-
+            //Kiểm tra xem sản phẩm này đã được thêm vào Flash Sale chưa.
             var existing = await _context.FlashSaleProducts
                 .FirstOrDefaultAsync(f => f.FlashSaleId == flashSaleId && f.ProductId == productId);
-
+            //Thêm sản phẩm vào Flash Sale nếu chưa có
             if (existing == null)
             {
                 decimal flashPriceRaw = product.Price * (1 - discountPercent / 100m);
@@ -179,28 +179,28 @@ namespace LHBooksWeb.Areas.Admin.Controllers
             return RedirectToAction("Details", new { id = item.FlashSaleId });
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var flashSale = await _context.FlashSales
-                .Include(fs => fs.FlashSaleProducts)
-                .FirstOrDefaultAsync(fs => fs.Id == id);
+        //[HttpPost]
+        //public async Task<IActionResult> Delete(int id)
+        //{
+        //    var flashSale = await _context.FlashSales
+        //        .Include(fs => fs.FlashSaleProducts)
+        //        .FirstOrDefaultAsync(fs => fs.Id == id);
 
-            if (flashSale == null)
-            {
-                return Json(new { success = false, message = "Không tìm thấy Flash Sale." });
-            }
+        //    if (flashSale == null)
+        //    {
+        //        return Json(new { success = false, message = "Không tìm thấy Flash Sale." });
+        //    }
 
-            _context.FlashSaleProducts.RemoveRange(flashSale.FlashSaleProducts);
-            _context.FlashSales.Remove(flashSale);
-            await _context.SaveChangesAsync();
+        //    _context.FlashSaleProducts.RemoveRange(flashSale.FlashSaleProducts);
+        //    _context.FlashSales.Remove(flashSale);
+        //    await _context.SaveChangesAsync();
 
-            return Json(new
-            {
-                success = true,
-                message = $"Đã xoá Flash Sale \"{flashSale.Title}\" thành công!"
-            });
-        }
+        //    return Json(new
+        //    {
+        //        success = true,
+        //        message = $"Đã xoá Flash Sale \"{flashSale.Title}\" thành công!"
+        //    });
+        //}
 
 
         [HttpGet]
