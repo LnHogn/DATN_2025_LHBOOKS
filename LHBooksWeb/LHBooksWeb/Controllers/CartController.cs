@@ -80,6 +80,7 @@ namespace LHBooksWeb.Controllers
         public async Task<IActionResult> RemoveFromCart(int cartItemId)
         {
             await _cartService.RemoveFromCartAsync(cartItemId);
+            TempData["success"] = "Xoá sản phẩm thành công!";
             return RedirectToAction("Index");
         }
 

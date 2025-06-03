@@ -166,7 +166,6 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                         TempData["ErrorMessage"] = $"Đã tạo người dùng nhưng không thể gán quyền {model.Role}.";
                         // Lưu ý: User đã được tạo, nhưng chưa có Role.
                         // Cân nhắc xóa user vừa tạo nếu việc gán role là bắt buộc và thất bại.
-                        // await _userManager.DeleteAsync(user); // Cân nhắc kỹ lưỡng khi dùng lệnh này
                     }
                 }
                 else
@@ -210,33 +209,23 @@ namespace LHBooksWeb.Areas.Admin.Controllers
 
             if (result.Succeeded)
             {
-                _logger.LogInformation("Người dùng {UserName} đăng nhập thành công.", model.UserName);
                 TempData["SuccessMessage"] = $"Xin chào, {model.UserName}! Đăng nhập thành công.";
                 return RedirectToLocal(returnUrl);
             }
 
             if (result.IsLockedOut)
             {
-                _logger.LogWarning("Tài khoản {UserName} bị khóa.", model.UserName);
-                TempData["ErrorMessage"] = "Tài khoản đã bị khóa. Vui lòng thử lại sau.";
-                return View("Lockout");
-            }
-            if (result.IsLockedOut)
-            {
-                _logger.LogWarning("Tài khoản {UserName} bị khóa.", model.UserName);
                 TempData["ErrorMessage"] = "Tài khoản đã bị khóa. Vui lòng thử lại sau.";
                 return View("Lockout");
             }
 
             if (result.IsNotAllowed)
             {
-                _logger.LogWarning("Tài khoản {UserName} chưa được xác nhận.", model.UserName);
                 ModelState.AddModelError(string.Empty, "Tài khoản chưa được xác nhận.");
                 TempData["ToastrWarning"] = "Tài khoản chưa được xác nhận.";
                 return View(model);
             }
 
-            _logger.LogWarning("Đăng nhập thất bại cho người dùng {UserName}.", model.UserName);
             ModelState.AddModelError(string.Empty, "Đăng nhập không thành công. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
             TempData["ErrorMessage"] = "Đăng nhập không thành công. Vui lòng kiểm tra lại tài khoản và mật khẩu.";
             return View(model);
@@ -303,12 +292,10 @@ namespace LHBooksWeb.Areas.Admin.Controllers
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
-                _logger.LogInformation($"User {user.UserName} status updated successfully.");
                 TempData["SuccessMessage"] = $"Cập nhật trạng thái người dùng {user.UserName} thành công.";
                 return Json(new { success = true, message = "Cập nhật trạng thái người dùng thành công.", toastr = "success" });
             }
 
-            _logger.LogError($"Error updating status for user {user.UserName}.");
             return Json(new { success = false, message = "Cập nhật trạng thái người dùng thất bại.", errors = result.Errors, toastr = "error" });
         }
 
@@ -336,12 +323,10 @@ namespace LHBooksWeb.Areas.Admin.Controllers
             var result = await _userManager.UpdateAsync(user);
             if (result.Succeeded)
             {
-                _logger.LogInformation($"User {user.UserName} status updated successfully.");
                 TempData["SuccessMessage"] = $"Cập nhật trạng thái người dùng {user.UserName} thành công.";
                 return Json(new { success = true, message = "Cập nhật trạng thái người dùng thành công.", toastr = "success" });
             }
 
-            _logger.LogError($"Error updating status for user {user.UserName}.");
             return Json(new { success = false, message = "Cập nhật trạng thái người dùng thất bại.", errors = result.Errors, toastr = "error" });
         }
 
@@ -368,7 +353,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
             {
                 Id = user.Id,
                 UserName = user.UserName,
-                FullName = user.FullName, // cần mở rộng class ApplicationUser
+                FullName = user.FullName,
                 PhoneNumber = user.PhoneNumber,
                 Email = user.Email,
                 Role = roles.FirstOrDefault() ?? "Không có",
