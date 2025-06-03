@@ -32,7 +32,7 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         {
             var order = await db.Orders
                 .Include(o => o.OrderDetails)
-                    .ThenInclude(od => od.Product) // Adding Product include if needed
+                    .ThenInclude(od => od.Product)
                 .Include(o => o.OrderDetails)
                     .ThenInclude(od => od.FlashSale)
                 .FirstOrDefaultAsync(o => o.Id == id);
