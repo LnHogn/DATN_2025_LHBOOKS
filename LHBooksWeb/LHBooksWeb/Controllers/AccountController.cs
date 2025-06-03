@@ -48,7 +48,7 @@ namespace LHBooksWeb.Controllers
 
             if (user == null)
             {
-                ModelState.AddModelError("", "Tài khoản không tồn tại.");
+                ViewBag.IsLockedMessage = "Tài khoản không tồn tại.";
                 return View(model);
             }
 

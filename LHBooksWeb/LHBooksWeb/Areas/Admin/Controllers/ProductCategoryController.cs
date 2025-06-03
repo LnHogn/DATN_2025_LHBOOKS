@@ -152,7 +152,6 @@ namespace LHBooksWeb.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [HttpPost]
         public IActionResult Delete(int id)
         {
             var cate = db.ProductCategories.Find(id);
