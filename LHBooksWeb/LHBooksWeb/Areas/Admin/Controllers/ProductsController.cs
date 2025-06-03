@@ -97,16 +97,6 @@ namespace LHBooksWeb.Areas.Admin.Controllers
                 ModelState.Remove("PublisherName");
                 ModelState.Remove("Translator");
 
-                if (model.Price == 0)
-                {
-                    ModelState.AddModelError("Price", "Vui lòng nhập giá gốc");
-                }
-
-                if (model.PriceSale == 0)
-                {
-                    ModelState.AddModelError("PriceSale", "Vui lòng nhập giá bán");
-                }
-
                 if (ModelState.IsValid)
                 {
                     

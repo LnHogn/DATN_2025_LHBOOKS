@@ -212,64 +212,67 @@ namespace LHBooksWeb.Services
 
             //gui email
 
-            var receiver = user.Email;
-            var subject = "Đặt hàng thành công - Mã đơn hàng: " + order.Code;
-
-            // Tạo nội dung email chi tiết
-            var messageBuilder = new System.Text.StringBuilder();
-            messageBuilder.AppendLine("<h2>Xác nhận đơn hàng</h2>");
-            messageBuilder.AppendLine("<p>Cảm ơn bạn đã đặt hàng tại cửa hàng của chúng tôi.</p>");
-            messageBuilder.AppendLine("<p><strong>Mã đơn hàng:</strong> " + order.Code + "</p>");
-            messageBuilder.AppendLine("<p><strong>Ngày đặt hàng:</strong> " + order.OrderDate.ToString("dd/MM/yyyy HH:mm:ss") + "</p>");
-
-            // 1. Kiểm tra xem có sản phẩm nào trong đơn hàng thuộc Flash Sale không
-            bool hasFlashSale = order.OrderDetails.Any(od => od.FlashSaleId != null);
-
-            // 2. Xây dựng bảng HTML
-            messageBuilder.AppendLine("<h3>Chi tiết đơn hàng:</h3>");
-            messageBuilder.AppendLine("<table border='1' cellpadding='5' cellspacing='0' " +
-                "style='border-collapse: collapse; width: 80%; text-align: center;'>");
-            messageBuilder.AppendLine("<tr>");
-            messageBuilder.AppendLine("<th>Tên sản phẩm</th>");
-            messageBuilder.AppendLine("<th>Giá</th>");
-            messageBuilder.AppendLine("<th>Số lượng</th>");
-            messageBuilder.AppendLine("<th>Thành tiền</th>");
-            if (hasFlashSale)
+            if(paymentMethod == 1)
             {
-                messageBuilder.AppendLine("<th>Flash Sale</th>");
-            }
-            messageBuilder.AppendLine("</tr>");
+                var receiver = user.Email;
+                var subject = "Đặt hàng thành công - Mã đơn hàng: " + order.Code;
 
-            // 3. Duyệt từng sản phẩm
-            foreach (var detail in order.OrderDetails)
-            {
+                // Tạo nội dung email chi tiết
+                var messageBuilder = new System.Text.StringBuilder();
+                messageBuilder.AppendLine("<h2>Xác nhận đơn hàng</h2>");
+                messageBuilder.AppendLine("<p>Cảm ơn bạn đã đặt hàng tại cửa hàng của chúng tôi.</p>");
+                messageBuilder.AppendLine("<p><strong>Mã đơn hàng:</strong> " + order.Code + "</p>");
+                messageBuilder.AppendLine("<p><strong>Ngày đặt hàng:</strong> " + order.OrderDate.ToString("dd/MM/yyyy HH:mm:ss") + "</p>");
+
+                // 1. Kiểm tra xem có sản phẩm nào trong đơn hàng thuộc Flash Sale không
+                bool hasFlashSale = order.OrderDetails.Any(od => od.FlashSaleId != null);
+
+                // 2. Xây dựng bảng HTML
+                messageBuilder.AppendLine("<h3>Chi tiết đơn hàng:</h3>");
+                messageBuilder.AppendLine("<table border='1' cellpadding='5' cellspacing='0' " +
+                    "style='border-collapse: collapse; width: 80%; text-align: center;'>");
                 messageBuilder.AppendLine("<tr>");
-                messageBuilder.AppendLine($"<td>{detail.ProductName}</td>");
-                messageBuilder.AppendLine($"<td>{detail.Price.ToString("N0")}₫</td>");
-                messageBuilder.AppendLine($"<td>{detail.Quantity}</td>");
-                messageBuilder.AppendLine($"<td>{(detail.Price * detail.Quantity).ToString("N0")}₫</td>");
-
+                messageBuilder.AppendLine("<th>Tên sản phẩm</th>");
+                messageBuilder.AppendLine("<th>Giá</th>");
+                messageBuilder.AppendLine("<th>Số lượng</th>");
+                messageBuilder.AppendLine("<th>Thành tiền</th>");
                 if (hasFlashSale)
                 {
-                    // Nếu đã include FlashSale, bạn có thể lấy tên
-                    var flashSaleTitle = detail.FlashSale != null ? detail.FlashSale.Title : "Không";
-                    messageBuilder.AppendLine($"<td>{flashSaleTitle}</td>");
+                    messageBuilder.AppendLine("<th>Flash Sale</th>");
                 }
-
                 messageBuilder.AppendLine("</tr>");
+
+                // 3. Duyệt từng sản phẩm
+                foreach (var detail in order.OrderDetails)
+                {
+                    messageBuilder.AppendLine("<tr>");
+                    messageBuilder.AppendLine($"<td>{detail.ProductName}</td>");
+                    messageBuilder.AppendLine($"<td>{detail.Price.ToString("N0")}₫</td>");
+                    messageBuilder.AppendLine($"<td>{detail.Quantity}</td>");
+                    messageBuilder.AppendLine($"<td>{(detail.Price * detail.Quantity).ToString("N0")}₫</td>");
+
+                    if (hasFlashSale)
+                    {
+                        // Nếu đã include FlashSale, bạn có thể lấy tên
+                        var flashSaleTitle = detail.FlashSale != null ? detail.FlashSale.Title : "Không";
+                        messageBuilder.AppendLine($"<td>{flashSaleTitle}</td>");
+                    }
+
+                    messageBuilder.AppendLine("</tr>");
+                }
+                messageBuilder.AppendLine("</table>");
+
+                messageBuilder.AppendLine($"<p><strong>Phí vận chuyển:</strong> {order.ShippingFee.ToString("N0")}₫</p>");
+                messageBuilder.AppendLine($"<p><strong>Tổng thanh toán:</strong> {order.TotalAmount.ToString("N0")}₫</p>");
+                messageBuilder.AppendLine($"<p><strong>Phương thức thanh toán:</strong> {(order.TypePayment == 1 ? "Thanh toán khi nhận hàng (COD)" : "Thanh toán online qua VNPAY")}</p>");
+                messageBuilder.AppendLine("<p>Chúng tôi sẽ liên hệ với bạn sớm để xác nhận đơn hàng và tiến hành giao hàng.</p>");
+                messageBuilder.AppendLine("<p>Trân trọng,</p>");
+                messageBuilder.AppendLine("<p><strong>Đội ngũ hỗ trợ khách hàng</strong></p>");
+
+                var message = messageBuilder.ToString();
+                await _emailSender.SendEmailAsync(receiver, subject, message);
             }
-            messageBuilder.AppendLine("</table>");
-
-            messageBuilder.AppendLine($"<p><strong>Phí vận chuyển:</strong> {order.ShippingFee.ToString("N0")}₫</p>");
-            messageBuilder.AppendLine($"<p><strong>Tổng thanh toán:</strong> {order.TotalAmount.ToString("N0")}₫</p>");
-            messageBuilder.AppendLine("<p>Chúng tôi sẽ liên hệ với bạn sớm để xác nhận đơn hàng và tiến hành giao hàng.</p>");
-            messageBuilder.AppendLine("<p>Trân trọng,</p>");
-            messageBuilder.AppendLine("<p><strong>Đội ngũ hỗ trợ khách hàng</strong></p>");
-
-            var message = messageBuilder.ToString();
-            await _emailSender.SendEmailAsync(receiver, subject, message);
-
-
+            
             return order;
         }
 

@@ -3,13 +3,16 @@ using LHBooksWeb.Data;
 using LHBooksWeb.Models.EF;
 using LHBooksWeb.Models.Vnpay;
 using LHBooksWeb.Services;
+using LHBooksWeb.Services.Email;
 using LHBooksWeb.Services.Vnpay;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Security.Claims;
+using IEmailSender = LHBooksWeb.Services.Email.IEmailSender;
 
 namespace LHBooksWeb.Controllers
 {
@@ -22,14 +25,15 @@ namespace LHBooksWeb.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IVnPayService _vnPayService;
         private readonly ApplicationDbContext _context;
-
-        public OrderController(OrderService orderService, UserManager<ApplicationUser> userManager, IVnPayService vnPayService, ApplicationDbContext context, CartService cartService)
+        private readonly IEmailSender _emailSender;
+        public OrderController(OrderService orderService, UserManager<ApplicationUser> userManager, IVnPayService vnPayService, ApplicationDbContext context, CartService cartService, IEmailSender emailSender)
         {
             _orderService = orderService;
             _userManager = userManager;
             _vnPayService = vnPayService;
             _context = context;
             _cartService = cartService;
+            _emailSender = emailSender;
         }
 
 
@@ -154,7 +158,11 @@ namespace LHBooksWeb.Controllers
                 return RedirectToAction("PaymentFail");
             }
 
-            var order = await _context.Orders.FindAsync(orderId);
+            var order = await _context.Orders
+                    .Include(o => o.OrderDetails)
+                        .ThenInclude(od => od.FlashSale) // nếu muốn lấy thông tin FlashSale
+                    .FirstOrDefaultAsync(o => o.Id == orderId);
+
             if (order == null)
             {
                 TempData["Message"] = "Đơn hàng không tồn tại.";
@@ -180,6 +188,61 @@ namespace LHBooksWeb.Controllers
             order.ModifiedDate = DateTime.Now;
             await _context.SaveChangesAsync(); // lưu thay đổi vào DB
             await _cartService.RemoveSelectedItemsAsync();
+
+            var user = await _userManager.FindByIdAsync(order.UserId);
+            if (user != null)
+            {
+                var receiver = user.Email;
+                var subject = "Đặt hàng thành công - Mã đơn hàng: " + order.Code;
+
+                var messageBuilder = new System.Text.StringBuilder();
+                messageBuilder.AppendLine("<h2>Xác nhận đơn hàng</h2>");
+                messageBuilder.AppendLine("<p>Cảm ơn bạn đã đặt hàng tại cửa hàng của chúng tôi.</p>");
+                messageBuilder.AppendLine("<p><strong>Mã đơn hàng:</strong> " + order.Code + "</p>");
+                messageBuilder.AppendLine("<p><strong>Ngày đặt hàng:</strong> " + order.OrderDate.ToString("dd/MM/yyyy HH:mm:ss") + "</p>");
+
+                bool hasFlashSale = order.OrderDetails.Any(od => od.FlashSaleId != null);
+
+                messageBuilder.AppendLine("<h3>Chi tiết đơn hàng:</h3>");
+                messageBuilder.AppendLine("<table border='1' cellpadding='5' cellspacing='0' style='border-collapse: collapse; width: 80%; text-align: center;'>");
+                messageBuilder.AppendLine("<tr>");
+                messageBuilder.AppendLine("<th>Tên sản phẩm</th>");
+                messageBuilder.AppendLine("<th>Giá</th>");
+                messageBuilder.AppendLine("<th>Số lượng</th>");
+                messageBuilder.AppendLine("<th>Thành tiền</th>");
+                if (hasFlashSale)
+                {
+                    messageBuilder.AppendLine("<th>Flash Sale</th>");
+                }
+                messageBuilder.AppendLine("</tr>");
+
+                foreach (var detail in order.OrderDetails)
+                {
+                    messageBuilder.AppendLine("<tr>");
+                    messageBuilder.AppendLine($"<td>{detail.ProductName}</td>");
+                    messageBuilder.AppendLine($"<td>{detail.Price.ToString("N0")}₫</td>");
+                    messageBuilder.AppendLine($"<td>{detail.Quantity}</td>");
+                    messageBuilder.AppendLine($"<td>{(detail.Price * detail.Quantity).ToString("N0")}₫</td>");
+                    if (hasFlashSale)
+                    {
+                        var flashSaleTitle = detail.FlashSale != null ? detail.FlashSale.Title : "Không";
+                        messageBuilder.AppendLine($"<td>{flashSaleTitle}</td>");
+                    }
+                    messageBuilder.AppendLine("</tr>");
+                }
+                messageBuilder.AppendLine("</table>");
+
+                messageBuilder.AppendLine($"<p><strong>Phí vận chuyển:</strong> {order.ShippingFee.ToString("N0")}₫</p>");
+                messageBuilder.AppendLine($"<p><strong>Tổng thanh toán:</strong> {order.TotalAmount.ToString("N0")}₫</p>");
+                messageBuilder.AppendLine($"<p><strong>Phương thức thanh toán:</strong> {(order.TypePayment == 1 ? "Thanh toán khi nhận hàng (COD)" : "Thanh toán online qua VNPAY")}</p>");
+                messageBuilder.AppendLine("<p>Chúng tôi sẽ liên hệ với bạn sớm để xác nhận đơn hàng và tiến hành giao hàng.</p>");
+                messageBuilder.AppendLine("<p>Trân trọng,</p>");
+                messageBuilder.AppendLine("<p><strong>Đội ngũ hỗ trợ khách hàng</strong></p>");
+
+                var message = messageBuilder.ToString();
+                await _emailSender.SendEmailAsync(receiver, subject, message);
+            }
+
             TempData["Message"] = "Thanh toán VnPay thành công, đơn hàng đã được xác nhận.";
             return RedirectToAction("OrderConfirmation");
         }

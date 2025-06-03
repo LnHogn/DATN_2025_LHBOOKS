@@ -121,7 +121,6 @@
                                         <label asp-for="PublisherId" class="control-label">Nhà xuất bản</label>
                                         <input type="text" id="PublisherInput" class="form-control" placeholder="Nhập tên nxb..." />
 
-                                        <!-- Hidden để lưu AuthorId -->
                                         <input type="hidden" id="PublisherId" name="PublisherId" />
                                         <span asp-validation-for="PublisherId" class="text-danger"></span>
                                     </div>
@@ -151,8 +150,7 @@
                                         <label class="control-label">Tác Giả</label>
                                         <input asp-for="AuthorName" type="text" id="authorInput" class="form-control" placeholder="Nhập tên tác giả..." />
 
-                                        <!-- Hidden để lưu AuthorId -->
-                                        <input type="hidden" id="authorId" name="AuthorName" />
+                                        <input type="hidden" id="authorName" name="AuthorName" />
                                         <span asp-validation-for="AuthorName" class="text-danger"></span>
                                     </div>
                                 </div>
@@ -384,7 +382,7 @@
             $("#authorInput").autocomplete({
                 source: function (request, response) {
                     $.ajax({
-                        url: '/Admin/Author/SearchAuthors', // đổi tên Controller nếu cần
+                        url: '/Admin/Author/SearchAuthors',
                         type: 'GET',
                         dataType: 'json',
                         data: { term: request.term },
@@ -397,7 +395,7 @@
                 minLength: 2,
                 select: function (event, ui) {
                     $("#authorInput").val(ui.item.label); // Gán tên vào ô hiển thị
-                    $("#authorId").val(ui.item.label);       // Gán ID vào hidden
+                    $("#authorName").val(ui.item.label);       // Gán ID vào hidden
                     return false; // không ghi đè giá trị mặc định
                 }
             });
